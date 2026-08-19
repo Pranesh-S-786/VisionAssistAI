@@ -1572,8 +1572,14 @@ Return your answer strictly in this JSON format without markdown code blocks:
                 data = {
                     intent: "edge_ai",
                     spoken_response: latestDetections.length > 0 ? "Detected " + latestDetections.map(d => d.class).join(', ') + " nearby." : "Your surroundings appear clear.",
-                    raw_data: { all_detections: latestDetections }
+                    raw_data: { all_detections: latestDetections, path_clear: latestDetections.filter(d => d.is_obstacle).length === 0 }
                 };
+            }
+
+            // Always fuse real-time spatial bounding boxes into raw_data
+            if (!data.raw_data) data.raw_data = {};
+            if (!data.raw_data.all_detections && latestDetections.length > 0) {
+                data.raw_data.all_detections = latestDetections;
             }
 
             const latency = Math.round(performance.now() - startTime);
@@ -1587,13 +1593,19 @@ Return your answer strictly in this JSON format without markdown code blocks:
                 guidanceCardBox.className = "guidance-box hazard-active";
                 triggerHaptic([150, 70, 150]);
             } else {
-                intentBadge.innerText = data.intent ? data.intent.replace(/_/g, ' ') : 'Response';
+                intentBadge.innerText = data.ai_engine ? `✨ ${data.ai_engine}` : (data.intent ? data.intent.replace(/_/g, ' ') : 'Response');
                 intentBadge.className = "guidance-badge gemini-badge";
                 guidanceCardBox.className = "guidance-box gemini-mode-active";
             }
 
             guidanceTextEl.innerText = data.spoken_response || "Analysis complete.";
             jsonOutput.innerText = JSON.stringify(data, null, 2);
+
+            // Draw bounding boxes on screen
+            const raw = data.raw_data || {};
+            const boxes = raw.all_detections || raw.hazards_detected || latestDetections || [];
+            drawBoundingBoxes(boxes);
+            document.getElementById('detectionCount').innerText = `${boxes.length} objects localized (YOLO & Gemini)`;
 
             speak(data.spoken_response);
 
