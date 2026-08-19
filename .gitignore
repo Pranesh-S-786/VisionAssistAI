@@ -1,0 +1,22 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Model Weights & DB (downloaded automatically at runtime)
+*.pt
+*.onnx
+memory.db
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

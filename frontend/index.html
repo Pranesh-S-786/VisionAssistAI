@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisionAssist AI — Intent-Aware Navigation Companion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #131b2e;
+            --bg-card: #182238;
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+            --accent-amber: #f6d365;
+            --accent-red: #ff416c;
+            --accent-green: #00b09b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --glow: 0 0 25px rgba(0, 242, 254, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px;
+            line-height: 1.5;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #000;
+            font-weight: 800;
+            font-size: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--glow);
+        }
+
+        .logo-title h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-title p {
+            font-size: 12px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        /* Main Layout Grid */
+        .app-grid {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Video & Canvas Container */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .camera-viewport {
+            position: relative;
+            width: 100%;
+            height: 340px;
+            background: #000;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #videoFeed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #overlayCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--bg-secondary);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-cyan);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            color: #000;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            box-shadow: var(--glow);
+            filter: brightness(1.1);
+        }
+
+        /* Voice Assistant Interaction Zone */
+        .voice-zone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(19, 27, 46, 0.4) 100%);
+            border-radius: var(--radius-md);
+            border: 1px dashed rgba(0, 242, 254, 0.3);
+            text-align: center;
+            gap: 14px;
+        }
+
+        .mic-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #000;
+            box-shadow: var(--glow);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .mic-button:hover {
+            transform: scale(1.08);
+        }
+
+        .mic-button.listening {
+            background: linear-gradient(135deg, var(--accent-red), #ff758c);
+            animation: pulse-ring 1.5s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(255, 65, 108, 0.7); }
+            70% { box-shadow: 0 0 0 25px rgba(255, 65, 108, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 65, 108, 0); }
+        }
+
+        .speech-input-box {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+        }
+
+        .text-input {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: #fff;
+            padding: 10px 14px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .text-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+
+        /* Demo Preset Quick-Actions for Judges */
+        .demo-presets-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            margin-top: 4px;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .preset-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 242, 254, 0.08);
+        }
+
+        .preset-tag {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 2px;
+        }
+
+        .preset-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Audio Guidance Output Box */
+        .guidance-box {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.08), rgba(79, 172, 254, 0.08));
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            position: relative;
+        }
+
+        .guidance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .guidance-badge {
+            background: var(--accent-cyan);
+            color: #000;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .spoken-text-display {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* JSON Inspector */
+        .json-viewer {
+            background: #06090e;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #38bdf8;
+            max-height: 180px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Innovation Footnote */
+        .pipeline-banner {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 20px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .pipeline-steps {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .pipeline-arrow {
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-group">
+            <div class="logo-badge">👁️</div>
+            <div class="logo-title">
+                <h1>VisionAssist AI</h1>
+                <p>Intent-Aware Navigation Companion</p>
+            </div>
+        </div>
+        <div class="status-pill" onclick="configureBackendUrl()" style="cursor:pointer;" title="Click to configure backend API URL">
+            <span class="status-dot"></span>
+            <span id="backendStatus">Backend: Checking...</span>
+            <span style="font-size:10px; opacity:0.6;">⚙️</span>
+        </div>
+    </header>
+
+    <main class="app-grid">
+        <!-- Left Column: Camera Viewport & Controls -->
+        <section class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span>📹</span> Live Environmental Perception
+                </div>
+                <div class="camera-controls">
+                    <button class="btn btn-sm" id="btnToggleCam" onclick="toggleCamera()">Start Webcam</button>
+                    <button class="btn btn-sm" id="btnFlipCam" onclick="toggleMirror()" title="Flip/Un-mirror camera feed">🪞 Flip Mirror</button>
+                    <label class="btn btn-sm" style="cursor:pointer;">
+                        📁 Upload Image
+                        <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileUpload(event)">
+                    </label>
+                </div>
+            </div>
+
+            <div class="camera-viewport">
+                <video id="videoFeed" autoplay playsinline muted style="display:none;"></video>
+                <img id="staticPreview" style="display:none; width:100%; height:100%; object-fit:contain;">
+                <canvas id="overlayCanvas"></canvas>
+                <div id="noCamPlaceholder" style="color:var(--text-muted); text-align:center; padding: 20px;">
+                    <p style="font-size:40px; margin-bottom:8px;">📷</p>
+                    <p style="font-weight:600;">Camera Idle</p>
+                    <p style="font-size:13px;">Click 'Start Webcam' or upload a sample image</p>
+                </div>
+            </div>
+
+            <!-- Speech & Command Center -->
+            <div class="voice-zone">
+                <button class="mic-button" id="micBtn" onclick="toggleSpeechRecognition()" title="Hold or click to speak">
+                    🎙️
+                </button>
+                <div>
+                    <div style="font-size:15px; font-weight:700;" id="micStatus">Click mic or press Space to Speak</div>
+                    <div style="font-size:12px; color:var(--text-muted);">Try: "Find my bottle", "Is my path safe?", "Read this label", "Where are my keys?"</div>
+                </div>
+
+                <div class="speech-input-box">
+                    <input type="text" id="textCommand" class="text-input" placeholder="Or type your command here..." onkeydown="if(event.key==='Enter') executeAssist()">
+                    <button class="btn btn-primary" onclick="executeAssist()">Ask AI</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Audio Guidance & Demo Presets -->
+        <section class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span>🔊</span> Actionable Audio Guidance
+                </div>
+                <button class="btn" style="padding:4px 10px; font-size:12px;" onclick="replaySpeech()">Repeat Audio 🔄</button>
+            </div>
+
+            <!-- Primary Guidance Card -->
+            <div class="guidance-box">
+                <div class="guidance-header">
+                    <span class="guidance-badge" id="intentBadge">Awaiting Command</span>
+                    <span style="font-size:12px; color:var(--text-muted);" id="responseTime">0 ms</span>
+                </div>
+                <div class="spoken-text-display" id="guidanceText">
+                    "VisionAssist ready. How can I help you navigate?"
+                </div>
+            </div>
+
+            <!-- 4 Quick-Action Demo Buttons for Judges -->
+            <div class="demo-presets-title">Judge Quick-Demo Presets</div>
+            <div class="demo-grid">
+                <div class="preset-btn" onclick="runPreset('Find my water bottle')">
+                    <div class="preset-tag">Demo 1: Object Finder</div>
+                    <div class="preset-text">🔍 "Find my water bottle"</div>
+                </div>
+                <div class="preset-btn" onclick="runPreset('Is there any obstacle in front of me?')">
+                    <div class="preset-tag">Demo 2: Hazard Filter</div>
+                    <div class="preset-text">⚠️ "Is my path clear?"</div>
+                </div>
+                <div class="preset-btn" onclick="runPreset('Read this medicine label')">
+                    <div class="preset-tag">Demo 3: Smart OCR</div>
+                    <div class="preset-text">💊 "Read medicine label"</div>
+                </div>
+                <div class="preset-btn" onclick="runPreset('Where are my keys?')">
+                    <div class="preset-tag">Demo 4: Object Memory</div>
+                    <div class="preset-text">🧠 "Where are my keys?"</div>
+                </div>
+            </div>
+
+            <!-- Raw JSON Inspector for Demonstration -->
+            <div style="margin-top: 8px;">
+                <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:flex; justify-content:space-between;">
+                    <span>Under-the-Hood Context Payload</span>
+                    <span id="detectionCount" style="color:var(--accent-cyan)">0 detections</span>
+                </div>
+                <div class="json-viewer" id="jsonOutput">{ "status": "idle" }</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Innovation Pipeline Footer -->
+    <footer class="pipeline-banner">
+        <div style="font-size:13px; font-weight:700; color:#fff;">Innovation Pipeline:</div>
+        <div class="pipeline-steps">
+            <span>Perception</span>
+            <span class="pipeline-arrow">➔</span>
+            <span>Intent Extraction</span>
+            <span class="pipeline-arrow">➔</span>
+            <span>Context Reasoning</span>
+            <span class="pipeline-arrow">➔</span>
+            <span>Actionable Guidance</span>
+            <span class="pipeline-arrow">➔</span>
+            <span>Object Memory</span>
+        </div>
+    </footer>
+
+    <script>
+        let API_URL = localStorage.getItem('visionassist_api_url') || ((window.location.protocol.startsWith('http') && !window.location.origin.includes('vercel.app')) ? window.location.origin : "http://localhost:8000");
+        let webcamStream = null;
+        let speechRecognition = null;
+        let isListening = false;
+        let lastSpokenText = "VisionAssist ready.";
+        let currentCapturedBase64 = null;
+
+        const videoEl = document.getElementById('videoFeed');
+        const canvasEl = document.getElementById('overlayCanvas');
+        const staticPreview = document.getElementById('staticPreview');
+        const noCamPlaceholder = document.getElementById('noCamPlaceholder');
+        const guidanceTextEl = document.getElementById('guidanceText');
+        const intentBadge = document.getElementById('intentBadge');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const micBtn = document.getElementById('micBtn');
+        const micStatus = document.getElementById('micStatus');
+        const textInput = document.getElementById('textCommand');
+
+        function configureBackendUrl() {
+            const current = API_URL;
+            const input = prompt("Enter VisionAssist Backend API URL (e.g. your Ngrok / Render / localhost URL):", current);
+            if (input && input.trim()) {
+                API_URL = input.trim().replace(/\/+$/, '');
+                localStorage.setItem('visionassist_api_url', API_URL);
+                checkBackend();
+            }
+        }
+
+        // Check Backend Health on load
+        async function checkBackend() {
+            try {
+                const res = await fetch(`${API_URL}/health`, { method: "GET" });
+                if (res.ok) {
+                    document.getElementById('backendStatus').innerText = `Connected: ${API_URL.replace('http://', '').replace('https://', '')}`;
+                    document.getElementById('backendStatus').style.color = "var(--accent-cyan)";
+                } else {
+                    throw new Error("HTTP " + res.status);
+                }
+            } catch (e) {
+                document.getElementById('backendStatus').innerText = "Backend: Offline (Click ⚙️ to set URL)";
+                document.getElementById('backendStatus').style.color = "var(--accent-red)";
+            }
+        }
+        checkBackend();
+
+        // 1. Text to Speech (TTS)
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel(); // stop previous speech
+            lastSpokenText = text;
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.rate = 1.05;
+            utter.pitch = 1.0;
+            window.speechSynthesis.speak(utter);
+        }
+
+        function replaySpeech() {
+            speak(lastSpokenText);
+        }
+
+        // 2. Speech-to-Text (STT) Setup
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRec) {
+            speechRecognition = new SpeechRec();
+            speechRecognition.continuous = false;
+            speechRecognition.interimResults = false;
+            speechRecognition.lang = 'en-US';
+
+            speechRecognition.onstart = () => {
+                isListening = true;
+                micBtn.classList.add('listening');
+                micStatus.innerText = "Listening... Speak your command";
+            };
+
+            speechRecognition.onresult = (e) => {
+                const transcript = e.results[0][0].transcript;
+                textInput.value = transcript;
+                micStatus.innerText = `Heard: "${transcript}"`;
+                executeAssist(transcript);
+            };
+
+            speechRecognition.onerror = (e) => {
+                console.error("STT Error:", e);
+                isListening = false;
+                micBtn.classList.remove('listening');
+                micStatus.innerText = "Voice error. Use typed input fallback.";
+            };
+
+            speechRecognition.onend = () => {
+                isListening = false;
+                micBtn.classList.remove('listening');
+            };
+        }
+
+        function toggleSpeechRecognition() {
+            if (!speechRecognition) {
+                alert("Speech recognition not supported in this browser. Please type command.");
+                return;
+            }
+            if (isListening) {
+                speechRecognition.stop();
+            } else {
+                speechRecognition.start();
+            }
+        }
+
+        // Keyboard Shortcut: Spacebar to toggle mic
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && document.activeElement !== textInput) {
+                e.preventDefault();
+                toggleSpeechRecognition();
+            }
+        });
+
+        // 3. Webcam Video Stream Control
+        async function toggleCamera() {
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(t => t.stop());
+                webcamStream = null;
+                videoEl.style.display = "none";
+                noCamPlaceholder.style.display = "block";
+                document.getElementById('btnToggleCam').innerText = "Start Webcam";
+            } else {
+                try {
+                    webcamStream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "environment" }
+                    });
+                    videoEl.srcObject = webcamStream;
+                    videoEl.style.display = "block";
+                    staticPreview.style.display = "none";
+                    noCamPlaceholder.style.display = "none";
+                    document.getElementById('btnToggleCam').innerText = "Stop Webcam";
+                } catch (err) {
+                    alert("Could not access camera: " + err.message);
+                }
+            }
+        }
+
+        let isMirrored = false;
+
+        function toggleMirror() {
+            isMirrored = !isMirrored;
+            const btn = document.getElementById('btnFlipCam');
+            if (isMirrored) {
+                videoEl.style.transform = "scaleX(-1)";
+                staticPreview.style.transform = "scaleX(-1)";
+                btn.style.borderColor = "var(--accent-cyan)";
+                btn.style.color = "var(--accent-cyan)";
+            } else {
+                videoEl.style.transform = "scaleX(1)";
+                staticPreview.style.transform = "scaleX(1)";
+                btn.style.borderColor = "var(--border)";
+                btn.style.color = "var(--text-main)";
+            }
+        }
+
+        // Frame Capture Helper
+        function captureCurrentFrameBase64() {
+            if (webcamStream && videoEl.videoWidth) {
+                const capCanvas = document.createElement('canvas');
+                capCanvas.width = videoEl.videoWidth;
+                capCanvas.height = videoEl.videoHeight;
+                const ctx = capCanvas.getContext('2d');
+                if (isMirrored) {
+                    ctx.translate(capCanvas.width, 0);
+                    ctx.scale(-1, 1);
+                }
+                ctx.drawImage(videoEl, 0, 0, capCanvas.width, capCanvas.height);
+                return capCanvas.toDataURL('image/jpeg', 0.85);
+            }
+            return currentCapturedBase64; // fallback to uploaded image
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentCapturedBase64 = e.target.result;
+                staticPreview.src = currentCapturedBase64;
+                staticPreview.style.display = "block";
+                videoEl.style.display = "none";
+                noCamPlaceholder.style.display = "none";
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 4. Draw Bounding Boxes on Overlay Canvas
+        function drawBoundingBoxes(detections) {
+            const ctx = canvasEl.getContext('2d');
+            canvasEl.width = videoEl.videoWidth || staticPreview.naturalWidth || 640;
+            canvasEl.height = videoEl.videoHeight || staticPreview.naturalHeight || 480;
+            ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+
+            if (!detections || detections.length === 0) return;
+
+            detections.forEach(det => {
+                if (!det.bbox) return;
+                let [x1, y1, x2, y2] = det.bbox;
+                
+                // If camera view is visually mirrored on screen, flip bounding box X coords so it aligns
+                if (isMirrored) {
+                    const originalX1 = x1;
+                    x1 = canvasEl.width - x2;
+                    x2 = canvasEl.width - originalX1;
+                }
+
+                const width = x2 - x1;
+                const height = y2 - y1;
+
+                // Box border
+                ctx.strokeStyle = "#00f2fe";
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x1, y1, width, height);
+
+                // Label background
+                ctx.fillStyle = "rgba(0, 242, 254, 0.9)";
+                const label = `${det.class || 'object'} (${det.position || ''})`;
+                ctx.font = "bold 16px Outfit, sans-serif";
+                const textWidth = ctx.measureText(label).width;
+                ctx.fillRect(x1, y1 > 25 ? y1 - 25 : y1, textWidth + 12, 24);
+
+                // Label text
+                ctx.fillStyle = "#000000";
+                ctx.fillText(label, x1 + 6, y1 > 25 ? y1 - 7 : y1 + 17);
+            });
+        }
+
+        // 5. Main Execution Gateway
+        async function executeAssist(customQuery = null) {
+            const query = customQuery || textInput.value.trim();
+            if (!query) return;
+
+            const startTime = performance.now();
+            guidanceTextEl.innerText = "Analyzing surroundings & intent...";
+            intentBadge.innerText = "Processing";
+
+            const imageBase64 = captureCurrentFrameBase64();
+
+            try {
+                const response = await fetch(`${API_URL}/assist`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        intent_text: query,
+                        image_base64: imageBase64
+                    })
+                });
+
+                const data = await response.json();
+                const latency = Math.round(performance.now() - startTime);
+                document.getElementById('responseTime').innerText = `${latency} ms`;
+
+                // Update UI state
+                intentBadge.innerText = data.intent ? data.intent.replace('_', ' ') : 'Response';
+                guidanceTextEl.innerText = data.spoken_response || "No response received.";
+                jsonOutput.innerText = JSON.stringify(data, null, 2);
+
+                // Draw bounding boxes if detections exist
+                const raw = data.raw_data || {};
+                const boxes = raw.all_detections || raw.hazards_detected || (raw.bbox ? [raw] : []);
+                drawBoundingBoxes(boxes);
+                document.getElementById('detectionCount').innerText = `${boxes.length} items parsed`;
+
+                // Speak response aloud
+                speak(data.spoken_response);
+
+            } catch (err) {
+                console.error("Assist Error:", err);
+                guidanceTextEl.innerText = "Cannot connect to VisionAssist backend at " + API_URL;
+                speak("Cannot connect to server. Please check backend.");
+            }
+        }
+
+        function runPreset(text) {
+            textInput.value = text;
+            executeAssist(text);
+        }
+    </script>
+</body>
+</html>
