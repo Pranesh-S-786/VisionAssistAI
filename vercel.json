@@ -23,27 +23,23 @@
   "rewrites": [
     {
       "source": "/manifest.json",
-      "destination": "/frontend/manifest.json"
+      "destination": "/manifest.json"
     },
     {
       "source": "/sw.js",
-      "destination": "/frontend/sw.js"
+      "destination": "/sw.js"
     },
     {
       "source": "/icon.svg",
-      "destination": "/frontend/icon.svg"
+      "destination": "/icon.svg"
     },
     {
       "source": "/favicon.ico",
-      "destination": "/frontend/icon.svg"
-    },
-    {
-      "source": "/",
-      "destination": "/frontend/index.html"
+      "destination": "/icon.svg"
     },
     {
       "source": "/(.*)",
-      "destination": "/frontend/$1"
+      "destination": "/index.html"
     }
   ]
 }
