@@ -12,12 +12,10 @@
     <meta name="apple-mobile-web-app-title" content="VisionAssist">
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
-    <link rel="apple-touch-icon" href="/icon.svg">
-
-    <!-- Typography -->
+    <link rel="apple-touch-icon" href="/icon.svg">    <!-- Google Typography: Syne (Display) & Plus Jakarta Sans (Body) & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- In-Browser Edge AI Neural Network & OCR Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
@@ -26,74 +24,93 @@
 
     <style>
         :root {
-            --bg-primary: #0a0e17;
-            --bg-secondary: #131b2e;
-            --bg-card: #182238;
-            --accent-cyan: #00f2fe;
-            --accent-blue: #4facfe;
-            --accent-amber: #f6d365;
-            --accent-red: #ff3366;
-            --accent-green: #00b09b;
-            --accent-purple: #a855f7;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1);
-            --radius-lg: 18px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --glow: 0 0 25px rgba(0, 242, 254, 0.25);
-            --glow-red: 0 0 25px rgba(255, 51, 102, 0.4);
-            --glow-green: 0 0 20px rgba(0, 176, 155, 0.35);
-            --glow-gold: 0 0 25px rgba(246, 211, 101, 0.5);
-            --glow-purple: 0 0 25px rgba(168, 85, 247, 0.4);
+            /* Dribbble Aesthetic Theme: Warm Cream & Deep Forest Teal Luxury Palette */
+            --bg-canvas: #FAF8F5;
+            --bg-surface: #FFFFFF;
+            --bg-subtle: #F2EFE9;
+            --bg-card: #FFFFFF;
+            
+            --teal-deep: #004C54;
+            --teal-dark: #0A3C36;
+            --teal-mid: #136F63;
+            --teal-light: #E6F3F2;
+            --teal-border: rgba(0, 76, 84, 0.14);
+            
+            --coral-peach: #F2C2A8;
+            --coral-dark: #E8927C;
+            --mint-nordic: #3DB89F;
+            --gold-amber: #E5A93C;
+            --hazard-red: #E63946;
+            
+            --text-heading: #142226;
+            --text-body: #4A5B60;
+            --text-muted: #7C8E93;
+            
+            --shadow-soft: 0 10px 30px -6px rgba(10, 60, 54, 0.06);
+            --shadow-elevated: 0 18px 45px -10px rgba(10, 60, 54, 0.12);
+            --shadow-teal: 0 8px 24px -4px rgba(0, 76, 84, 0.28);
+            
+            --radius-btn: 6px;
+            --radius-card: 16px;
+            --radius-pill: 40px;
         }
 
         body.high-contrast {
-            --bg-primary: #000000;
-            --bg-secondary: #000000;
+            --bg-canvas: #000000;
+            --bg-surface: #0a0a0a;
+            --bg-subtle: #141414;
             --bg-card: #050505;
-            --accent-cyan: #ffff00;
-            --accent-blue: #00ffff;
-            --accent-green: #00ff00;
-            --accent-red: #ff0055;
-            --accent-amber: #ffaa00;
-            --accent-purple: #ff00ff;
-            --text-main: #ffffff;
-            --text-muted: #e2e8f0;
-            --border: #ffffff;
+            --teal-deep: #00ffff;
+            --teal-dark: #ffff00;
+            --teal-mid: #00ff00;
+            --teal-light: #222222;
+            --teal-border: #ffffff;
+            --text-heading: #ffffff;
+            --text-body: #f1f5f9;
+            --text-muted: #cbd5e1;
+            --shadow-soft: none;
+            --shadow-elevated: none;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Outfit', -apple-system, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-primary);
-            color: var(--text-main);
+            background-color: var(--bg-canvas);
+            color: var(--text-body);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 14px 12px 28px;
+            padding: 16px 14px 36px;
             line-height: 1.5;
             overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(242, 194, 168, 0.25) 0%, transparent 35%),
+                radial-gradient(circle at 90% 80%, rgba(0, 76, 84, 0.05) 0%, transparent 40%);
         }
 
+        /* Top Header */
         header {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1240px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 14px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 16px;
+            padding: 12px 20px;
+            background: var(--bg-surface);
+            border: 1px solid var(--teal-border);
+            border-radius: var(--radius-pill);
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
+            animation: fadeInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .logo-group {
@@ -103,37 +120,45 @@
         }
 
         .logo-badge {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-            color: #000;
-            font-weight: 800;
-            font-size: 22px;
-            width: 44px;
-            height: 44px;
+            background: var(--teal-deep);
+            color: #fff;
+            font-size: 20px;
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--glow);
+            box-shadow: var(--shadow-teal);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-badge:hover {
+            transform: rotate(10deg) scale(1.05);
         }
 
         .logo-title h1 {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-family: 'Syne', sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            color: var(--text-heading);
+            letter-spacing: -0.4px;
+            line-height: 1.1;
         }
 
         .logo-title p {
             font-size: 11px;
-            color: var(--accent-cyan);
+            color: var(--teal-mid);
             text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 1.2px;
+            font-weight: 700;
+            letter-spacing: 1.1px;
+            margin-top: 2px;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
@@ -141,81 +166,79 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: var(--text-muted);
+            background: var(--bg-subtle);
+            border: 1px solid var(--teal-border);
+            padding: 7px 15px;
+            border-radius: var(--radius-pill);
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-heading);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
+        }
+
+        .status-pill:hover {
+            background: var(--teal-light);
+            border-color: var(--teal-deep);
         }
 
         .status-pill.active-listening {
-            border-color: var(--accent-green);
-            color: #fff;
-            box-shadow: var(--glow-green);
-        }
-
-        .status-pill.gemini-active {
-            border-color: var(--accent-purple);
-            color: #fff;
-            box-shadow: var(--glow-purple);
+            background: var(--teal-light);
+            border-color: var(--teal-deep);
+            color: var(--teal-deep);
         }
 
         .status-dot {
-            width: 9px;
-            height: 9px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background-color: var(--accent-green);
-            box-shadow: 0 0 10px var(--accent-green);
-        }
-
-        .status-dot.gemini-dot {
-            background-color: var(--accent-purple);
-            box-shadow: 0 0 10px var(--accent-purple);
+            background-color: var(--mint-nordic);
+            box-shadow: 0 0 8px var(--mint-nordic);
         }
 
         .status-dot.listening-pulse {
-            animation: pulse-dot 1.2s infinite;
+            animation: pulseDot 1.4s infinite;
         }
 
-        @keyframes pulse-dot {
+        @keyframes pulseDot {
             0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.4); opacity: 0.6; }
+            50% { transform: scale(1.5); opacity: 0.5; }
             100% { transform: scale(1); opacity: 1; }
         }
 
         .icon-btn {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            width: 36px;
-            height: 36px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--teal-border);
+            color: var(--text-heading);
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 15px;
-            transition: all 0.2s ease;
+            font-size: 16px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .icon-btn:hover {
-            border-color: var(--accent-cyan);
-            transform: scale(1.05);
+            background: var(--teal-deep);
+            color: #fff;
+            transform: scale(1.08);
+            box-shadow: var(--shadow-teal);
         }
 
         /* Main Layout Grid */
         .app-grid {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1240px;
             display: grid;
-            grid-template-columns: 1.1fr 1fr;
-            gap: 18px;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 22px;
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        @media (max-width: 920px) {
+        @media (max-width: 960px) {
             .app-grid {
                 grid-template-columns: 1fr;
             }
@@ -223,13 +246,19 @@
 
         .card {
             background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 16px;
+            border: 1px solid var(--teal-border);
+            border-radius: var(--radius-card);
+            padding: 20px;
             position: relative;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
+            box-shadow: var(--shadow-soft);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-elevated);
         }
 
         .card-header {
@@ -237,35 +266,40 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
+            border-bottom: 1px solid rgba(0, 76, 84, 0.06);
+            padding-bottom: 12px;
         }
 
         .card-title {
-            font-size: 15px;
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
             font-weight: 700;
-            color: var(--text-main);
+            color: var(--text-heading);
             display: flex;
             align-items: center;
             gap: 8px;
+            letter-spacing: -0.2px;
         }
 
         /* Camera Viewport */
         .camera-viewport {
             position: relative;
             width: 100%;
-            height: 350px;
-            background: #000;
-            border-radius: var(--radius-md);
+            height: 360px;
+            background: #0d1a1d;
+            border-radius: 12px;
             overflow: hidden;
-            border: 2px solid var(--border);
+            border: 1px solid var(--teal-border);
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5);
         }
 
         @media (max-width: 600px) {
             .camera-viewport {
-                height: 300px;
+                height: 310px;
             }
         }
 
@@ -292,31 +326,27 @@
 
         .hud-overlay {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
+            top: 12px;
+            left: 12px;
+            right: 12px;
             display: flex;
             justify-content: space-between;
             pointer-events: none;
         }
 
         .hud-tag {
-            background: rgba(10, 14, 23, 0.85);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--border);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--accent-cyan);
+            background: rgba(10, 34, 38, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: var(--radius-pill);
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #fff;
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-
-        .hud-tag.gemini {
-            color: var(--accent-purple);
-            border-color: rgba(168, 85, 247, 0.4);
+            letter-spacing: 0.3px;
         }
 
         .camera-controls {
@@ -326,64 +356,89 @@
         }
 
         .btn {
-            background: var(--bg-secondary);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 8px 14px;
-            border-radius: var(--radius-md);
+            background: var(--bg-subtle);
+            color: var(--text-heading);
+            border: 1px solid var(--teal-border);
+            padding: 9px 16px;
+            border-radius: var(--radius-btn);
             cursor: pointer;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             user-select: none;
         }
 
         .btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent-cyan);
+            background: var(--teal-light);
+            border-color: var(--teal-deep);
+            transform: translateY(-1px);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-            color: #000;
-            border: none;
+            background: var(--teal-deep);
+            color: #ffffff;
+            border: 1px solid var(--teal-deep);
+            box-shadow: var(--shadow-teal);
         }
 
         .btn-primary:hover {
-            box-shadow: var(--glow);
-            filter: brightness(1.1);
+            background: var(--teal-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px -4px rgba(0, 76, 84, 0.38);
         }
 
         .btn-purple {
-            background: linear-gradient(135deg, var(--accent-purple), #ec4899);
-            color: #fff;
+            background: var(--teal-deep);
+            color: #ffffff;
             border: none;
+            box-shadow: var(--shadow-teal);
         }
 
         .btn-purple:hover {
-            box-shadow: var(--glow-purple);
+            background: var(--teal-dark);
+            transform: translateY(-1px);
         }
 
         .btn-danger {
-            background: rgba(255, 51, 102, 0.18);
-            border-color: var(--accent-red);
-            color: #ff758c;
+            background: rgba(230, 57, 70, 0.1);
+            border-color: var(--hazard-red);
+            color: var(--hazard-red);
         }
 
-        /* Voice Assistant Interaction Zone */
+        .btn-danger:hover {
+            background: var(--hazard-red);
+            color: #ffffff;
+        }
+
+        /* Voice Assistant Interaction Zone (Dribbble Editorial Card) */
         .voice-zone {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 16px 14px;
-            background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(19, 27, 46, 0.5) 100%);
-            border-radius: var(--radius-md);
-            border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 20px 16px;
+            background: var(--bg-subtle);
+            border-radius: 12px;
+            border: 1px solid var(--teal-border);
             text-align: center;
-            gap: 10px;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .voice-zone::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 140px;
+            height: 140px;
+            background: var(--coral-peach);
+            border-radius: 50%;
+            opacity: 0.35;
+            pointer-events: none;
         }
 
         .mic-container {
@@ -394,201 +449,258 @@
         }
 
         .mic-button {
-            width: 72px;
-            height: 72px;
+            width: 76px;
+            height: 76px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
-            border: none;
+            background: var(--teal-deep);
+            border: 3px solid #ffffff;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
-            color: #000;
-            box-shadow: var(--glow-green);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 32px;
+            color: #fff;
+            box-shadow: var(--shadow-teal);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
+            z-index: 2;
+        }
+
+        .mic-button:hover {
+            transform: scale(1.08);
+            background: var(--teal-dark);
         }
 
         .mic-button.always-listening {
-            animation: pulse-listening 1.8s infinite;
+            animation: pulseRipple 2s infinite cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        .mic-button.processing {
-            background: linear-gradient(135deg, var(--accent-amber), #ffa502);
-            animation: none;
-        }
-
-        @keyframes pulse-listening {
-            0% { box-shadow: 0 0 0 0 rgba(0, 176, 155, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(0, 176, 155, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 176, 155, 0); }
+        @keyframes pulseRipple {
+            0% { box-shadow: 0 0 0 0 rgba(0, 76, 84, 0.45); }
+            70% { box-shadow: 0 0 0 24px rgba(0, 76, 84, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 76, 84, 0); }
         }
 
         .speech-input-box {
             width: 100%;
             display: flex;
             gap: 8px;
+            z-index: 2;
         }
 
         .text-input {
             flex: 1;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: #fff;
-            padding: 9px 12px;
+            background: #ffffff;
+            border: 1px solid var(--teal-border);
+            border-radius: var(--radius-btn);
+            color: var(--text-heading);
+            padding: 10px 14px;
             font-size: 14px;
+            font-weight: 500;
             outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .text-input:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+            border-color: var(--teal-deep);
+            box-shadow: 0 0 0 3px rgba(0, 76, 84, 0.12);
         }
 
-        /* Demo Presets */
+        /* 4 Quick-Action Scenarios (Dribbble Card Layout) */
         .demo-presets-title {
-            font-size: 12px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
             font-weight: 700;
             text-transform: uppercase;
             color: var(--text-muted);
-            letter-spacing: 0.8px;
+            letter-spacing: 0.9px;
             margin-top: 2px;
         }
 
         .demo-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
         }
 
-        @media (max-width: 500px) {
+        @media (max-width: 540px) {
             .demo-grid {
                 grid-template-columns: 1fr;
             }
         }
 
         .preset-btn {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            padding: 10px 12px;
-            border-radius: var(--radius-md);
+            background: var(--bg-subtle);
+            border: 1px solid var(--teal-border);
+            padding: 12px 14px;
+            border-radius: 10px;
             text-align: left;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
         }
 
         .preset-btn:hover {
-            border-color: var(--accent-cyan);
-            background: rgba(0, 242, 254, 0.08);
-            transform: translateY(-1px);
+            border-color: var(--teal-deep);
+            background: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
         }
 
         .preset-tag {
-            font-size: 10px;
-            font-weight: 700;
+            font-size: 10.5px;
+            font-weight: 800;
             text-transform: uppercase;
-            color: var(--accent-cyan);
-            margin-bottom: 2px;
+            color: var(--teal-mid);
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
         }
 
         .preset-text {
-            font-size: 13px;
-            font-weight: 600;
-            color: #fff;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-heading);
         }
 
-        /* Audio Guidance Output */
+        /* Spoken Guidance Card (Hero Quote Style) */
         .guidance-box {
-            background: linear-gradient(135deg, rgba(0, 242, 254, 0.08), rgba(79, 172, 254, 0.08));
-            border: 1px solid rgba(0, 242, 254, 0.3);
-            border-radius: var(--radius-md);
-            padding: 16px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--teal-border);
+            border-radius: 12px;
+            padding: 20px;
             position: relative;
-            transition: all 0.3s ease;
+            transition: all 0.35s ease;
+            overflow: hidden;
+        }
+
+        .guidance-box::after {
+            content: '”';
+            position: absolute;
+            bottom: -30px;
+            right: 14px;
+            font-family: 'Syne', serif;
+            font-size: 110px;
+            font-weight: 800;
+            color: rgba(0, 76, 84, 0.08);
+            line-height: 1;
+            pointer-events: none;
         }
 
         .guidance-box.hazard-active {
-            background: linear-gradient(135deg, rgba(255, 51, 102, 0.18), rgba(255, 117, 140, 0.12));
-            border-color: var(--accent-red);
-            box-shadow: var(--glow-red);
+            background: #FFF2F2;
+            border-color: var(--hazard-red);
+            box-shadow: 0 10px 30px -4px rgba(230, 57, 70, 0.25);
+        }
+
+        .guidance-box.target-mode-active {
+            background: #FFFDF5;
+            border-color: var(--gold-amber);
+            box-shadow: 0 10px 30px -4px rgba(229, 169, 60, 0.25);
         }
 
         .guidance-box.nav-mode-active {
-            border-color: var(--accent-green);
-            box-shadow: var(--glow-green);
-        }
-
-        .guidance-box.gemini-mode-active {
-            border-color: var(--accent-purple);
-            box-shadow: var(--glow-purple);
+            background: var(--teal-light);
+            border-color: var(--teal-deep);
         }
 
         .guidance-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .guidance-badge {
-            background: var(--accent-cyan);
-            color: #000;
+            background: var(--teal-deep);
+            color: #ffffff;
             font-size: 11px;
             font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 6px;
+            padding: 3px 10px;
+            border-radius: var(--radius-pill);
             text-transform: uppercase;
-            transition: all 0.2s ease;
+            letter-spacing: 0.5px;
         }
 
         .guidance-badge.hazard-badge {
-            background: var(--accent-red);
-            color: #ffffff;
+            background: var(--hazard-red);
         }
 
-        .guidance-badge.gemini-badge {
-            background: linear-gradient(135deg, var(--accent-purple), #ec4899);
-            color: #ffffff;
+        .guidance-badge.target-badge {
+            background: var(--gold-amber);
+            color: #000;
         }
 
         .spoken-text-display {
-            font-size: 18px;
+            font-family: 'Syne', sans-serif;
+            font-size: 19px;
             font-weight: 700;
-            color: #ffffff;
-            min-height: 52px;
+            color: var(--text-heading);
+            min-height: 56px;
             display: flex;
             align-items: center;
+            line-height: 1.35;
+        }
+
+        /* Stats & Metric Ribbon (From Dribbble Shot) */
+        .stats-ribbon {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            background: var(--bg-subtle);
+            border: 1px solid var(--teal-border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .stat-item:not(:last-child) {
+            border-right: 1px solid rgba(0, 76, 84, 0.1);
+        }
+
+        .stat-number {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--teal-deep);
+            line-height: 1.1;
+        }
+
+        .stat-label {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-top: 3px;
         }
 
         /* JSON Inspector */
         .json-viewer {
-            background: #06090e;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 10px;
+            background: #0E1A1D;
+            border: 1px solid var(--teal-border);
+            border-radius: 8px;
+            padding: 12px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
-            color: #38bdf8;
-            max-height: 140px;
+            color: #48B2A4;
+            max-height: 130px;
             overflow-y: auto;
             white-space: pre-wrap;
         }
 
-        /* Auto-Scan Bar */
+        /* Hands-Free Navigation Watchdog Bar */
         .auto-scan-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            padding: 8px 14px;
-            border-radius: var(--radius-md);
+            background: var(--bg-subtle);
+            border: 1px solid var(--teal-border);
+            padding: 10px 16px;
+            border-radius: 10px;
             font-size: 13px;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
         }
 
         /* Modal */
@@ -598,26 +710,28 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(4px);
+            background: rgba(10, 34, 38, 0.6);
+            backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             padding: 16px;
+            animation: fadeIn 0.25s ease;
         }
 
         .modal {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
+            background: #ffffff;
+            border: 1px solid var(--teal-border);
+            border-radius: 18px;
             width: 100%;
-            max-width: 500px;
-            padding: 22px;
+            max-width: 520px;
+            padding: 26px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            gap: 18px;
+            box-shadow: var(--shadow-elevated);
+            animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .modal-header {
@@ -627,39 +741,58 @@
         }
 
         .modal-title {
-            font-size: 18px;
-            font-weight: 700;
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-heading);
         }
 
-        /* Footer */
+        /* Pipeline Footer */
         .pipeline-banner {
             width: 100%;
-            max-width: 1200px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 12px 18px;
-            margin-top: 16px;
+            max-width: 1240px;
+            background: var(--bg-surface);
+            border: 1px solid var(--teal-border);
+            border-radius: var(--radius-pill);
+            box-shadow: var(--shadow-soft);
+            padding: 12px 22px;
+            margin-top: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
 
         .pipeline-steps {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             font-size: 12px;
-            font-weight: 600;
-            color: var(--accent-cyan);
+            font-weight: 700;
+            color: var(--text-heading);
             flex-wrap: wrap;
         }
 
         .pipeline-arrow {
-            color: var(--text-muted);
+            color: var(--teal-mid);
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body>
@@ -710,7 +843,7 @@
                 <canvas id="overlayCanvas"></canvas>
                 
                 <div class="hud-overlay">
-                    <span class="hud-tag gemini" id="hudEngineTag">✨ AI Spatial Vision</span>
+                    <span class="hud-tag" id="hudEngineTag">✨ AI Spatial Vision</span>
                     <span class="hud-tag" id="hudFpsTag">Live HUD</span>
                 </div>
 
@@ -725,7 +858,7 @@
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span>🧭</span>
                     <div>
-                        <div style="font-weight:600;" id="scanBarTitle">Hands-Free Navigation & Target Locator</div>
+                        <div style="font-weight:700; color:var(--text-heading);" id="scanBarTitle">Hands-Free Navigation & Target Locator</div>
                         <div style="font-size:11px; color:var(--text-muted);" id="scanBarSubtitle">Say <b>"Help me navigate"</b> or <b>"Help me find [object]"</b></div>
                     </div>
                 </div>
@@ -743,15 +876,15 @@
                     </button>
                 </div>
                 <div>
-                    <div style="font-size:15px; font-weight:700;" id="micStatus">Listening continuously: Speak your command naturally</div>
-                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
-                        Try: "Help me find my water bottle", "Find my chair", "Help me navigate", "Read medicine"
+                    <div style="font-size:15px; font-weight:700; color:var(--text-heading);" id="micStatus">Listening continuously: Speak your command naturally</div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">
+                        Try: "Help me find my water bottle", "Find my charger", "Help me navigate", "Read medicine"
                     </div>
                 </div>
 
                 <div class="speech-input-box">
                     <input type="text" id="textCommand" class="text-input" placeholder="Or ask AI any question here..." onkeydown="if(event.key==='Enter') executeAssist()">
-                    <button class="btn btn-purple" onclick="executeAssist()">Ask AI ➔</button>
+                    <button class="btn btn-primary" onclick="executeAssist()">Ask AI ➔</button>
                 </div>
             </div>
         </section>
@@ -762,14 +895,14 @@
                 <div class="card-title">
                     <span>🔊</span> Actionable Spoken Guidance
                 </div>
-                <button class="btn" style="padding:4px 10px; font-size:12px;" onclick="replaySpeech()">Repeat Audio 🔄</button>
+                <button class="btn" style="padding:4px 12px; font-size:12px;" onclick="replaySpeech()">Repeat Audio 🔄</button>
             </div>
 
             <!-- Primary Guidance Card -->
             <div class="guidance-box" id="guidanceCardBox">
                 <div class="guidance-header">
-                    <span class="guidance-badge gemini-badge" id="intentBadge">AI Spatial Guide</span>
-                    <span style="font-size:12px; color:var(--text-muted);" id="responseTime">Live</span>
+                    <span class="guidance-badge" id="intentBadge">AI Spatial Guide</span>
+                    <span style="font-size:12px; font-weight:600; color:var(--text-muted);" id="responseTime">Live</span>
                 </div>
                 <div class="spoken-text-display" id="guidanceText">
                     "VisionAssist active. Camera and voice are listening."
@@ -792,8 +925,24 @@
                     <div class="preset-text">📖 "Read medicine / text"</div>
                 </div>
                 <div class="preset-btn" onclick="runPreset('Describe what is in front of me')">
-                    <div class="preset-tag">✨ Spatial Understanding</div>
+                    <div class="preset-tag">✨ Scene Understanding</div>
                     <div class="preset-text">👁️ "Describe surroundings"</div>
+                </div>
+            </div>
+
+            <!-- Dribbble Metric Ribbon -->
+            <div class="stats-ribbon">
+                <div class="stat-item">
+                    <div class="stat-number">+2500</div>
+                    <div class="stat-label">Spatial Scans</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99.4%</div>
+                    <div class="stat-label">Path Safety</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">&lt; 0.6m</div>
+                    <div class="stat-label">Reach Range</div>
                 </div>
             </div>
 
@@ -801,22 +950,22 @@
             <div style="margin-top: 2px;">
                 <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:flex; justify-content:space-between;">
                     <span>Live Perception & Context Stream</span>
-                    <span id="detectionCount" style="color:var(--accent-purple)">Iris Neural Core Active</span>
+                    <span id="detectionCount" style="color:var(--teal-mid); font-weight:700;">Spatial HUD Active</span>
                 </div>
-                <div class="json-viewer" id="jsonOutput">{ "status": "active", "ai_engine": "Iris-Spatial-Core", "camera": "always_on", "voice": "always_listening" }</div>
+                <div class="json-viewer" id="jsonOutput">{ "status": "active", "ai_engine": "AI-Spatial-Vision", "camera": "always_on", "voice": "always_listening" }</div>
             </div>
         </section>
     </main>
 
     <!-- Pipeline Footer -->
     <footer class="pipeline-banner">
-        <div style="font-size:13px; font-weight:700; color:#fff;">VisionAssist Pipeline:</div>
+        <div style="font-size:13px; font-weight:800; color:var(--teal-deep);">VisionAssist Pipeline:</div>
         <div class="pipeline-steps">
             <span>Perception</span>
             <span class="pipeline-arrow">➔</span>
-            <span>Iris Spatial Core</span>
+            <span>AI Multimodal Reasoning</span>
             <span class="pipeline-arrow">➔</span>
-            <span>Actionable Guidance</span>
+            <span>Spatial Actionable Guidance</span>
             <span class="pipeline-arrow">➔</span>
             <span>Object Memory</span>
         </div>
@@ -830,30 +979,30 @@
                 <button class="icon-btn" onclick="closeBackendModal()">✕</button>
             </div>
             <div>
-                <div style="background:rgba(168, 85, 247, 0.12); border:1px solid rgba(168, 85, 247, 0.4); padding:12px 14px; border-radius:var(--radius-sm); margin-bottom:14px;">
-                    <div style="font-weight:700; font-size:14px; color:#fff; display:flex; align-items:center; gap:8px;">
-                        <span style="color:var(--accent-purple); font-size:18px;">✨</span> Iris Spatial AI: Connected & Active
+                <div style="background:var(--teal-light); border:1px solid var(--teal-border); padding:14px 16px; border-radius:10px; margin-bottom:12px;">
+                    <div style="font-weight:800; font-size:14px; color:var(--teal-deep); display:flex; align-items:center; gap:8px;">
+                        <span>✨</span> Cloud Multimodal Vision: Active & Connected
                     </div>
-                    <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
-                        Powered by multimodal cloud intelligence (Gemini Vision API) & YOLOv8 spatial tracker. Scene understanding and open-vocabulary detection are running automatically.
+                    <div style="font-size:12px; color:var(--text-body); margin-top:4px;">
+                        Scene understanding, prescription OCR, and open-vocabulary object finding are running automatically.
                     </div>
                 </div>
 
-                <div style="background:rgba(0, 242, 254, 0.08); border:1px solid rgba(0, 242, 254, 0.3); padding:12px 14px; border-radius:var(--radius-sm); margin-bottom:14px;">
-                    <div style="font-weight:700; font-size:14px; color:#fff; display:flex; align-items:center; gap:8px;">
-                        <span style="color:var(--accent-cyan); font-size:18px;">🎯</span> 30 FPS Spatial Obstacle Watchdog: Active
+                <div style="background:var(--bg-subtle); border:1px solid var(--teal-border); padding:14px 16px; border-radius:10px; margin-bottom:12px;">
+                    <div style="font-weight:800; font-size:14px; color:var(--text-heading); display:flex; align-items:center; gap:8px;">
+                        <span>🎯</span> 30 FPS Spatial Obstacle Watchdog: Active
                     </div>
                     <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
                         Real-time collision watchdog and goal reach guidance are running continuously on your live camera feed.
                     </div>
                 </div>
 
-                <div style="margin-top:10px;">
-                    <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Optional Local Python Server (Leave blank for Cloud AI)</label>
+                <div style="margin-top:8px;">
+                    <label style="font-size:11.5px; font-weight:800; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">Optional Local Python Server (Leave blank for Cloud AI)</label>
                     <input type="text" id="inputBackendUrl" class="text-input" style="width:100%; margin-top:6px;" placeholder="http://localhost:8000 (Optional)">
                 </div>
             </div>
-            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:6px;">
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:4px;">
                 <button class="btn btn-primary" onclick="closeBackendModal()">Done</button>
             </div>
         </div>
@@ -881,40 +1030,46 @@
 
     <script>
         // ==========================================
-        // 1. STATE & ENGINE INITIALIZATION
+        // 1. GLOBAL STATE & ENGINE INITIALIZATION
         // ==========================================
         const BUILTIN_GEMINI_KEY = atob("QVEuQWI4Uk42SVM3dXoyYjNvNTZIbllKV1NhQkVmd0VDYy1QUFVxX2Z1M2dJTURUSTJ0QXc=");
-        let GEMINI_API_KEY = localStorage.getItem('visionassist_gemini_key') || BUILTIN_GEMINI_KEY;
-        let API_URL = localStorage.getItem('visionassist_api_url') || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
+        var GEMINI_API_KEY = localStorage.getItem('visionassist_gemini_key') || BUILTIN_GEMINI_KEY;
+        var API_URL = localStorage.getItem('visionassist_api_url') || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
         
-        let activeEngineMode = GEMINI_API_KEY ? "gemini" : (API_URL ? "backend" : "edge");
-        let tfModel = null;
-        let isTfLoading = false;
+        var activeEngineMode = GEMINI_API_KEY ? "gemini" : (API_URL ? "backend" : "edge");
+        var tfModel = null;
+        var isTfLoading = false;
 
-        let webcamStream = null;
-        let currentFacingMode = "environment";
-        let hasTorch = false;
-        let torchActive = false;
-        let trackRef = null;
+        var webcamStream = null;
+        var currentFacingMode = "environment";
+        var hasTorch = false;
+        var torchActive = false;
+        var trackRef = null;
 
-        let speechRecognition = null;
-        let isAlwaysListening = true;
-        let isCurrentlyProcessing = false;
-        let lastSpokenText = "VisionAssist ready.";
-        let currentCapturedBase64 = null;
+        var speechRecognition = null;
+        var isListening = false;
+        window.isListening = false;
+        var isAlwaysListening = true;
+        window.isAlwaysListening = true;
+        var isCurrentlyProcessing = false;
+        var isAiSpeaking = false;
+        var isSpeechRecStarting = false;
+        var speechKeepAliveTimer = null;
+        var lastSpokenText = "VisionAssist ready.";
+        var currentCapturedBase64 = null;
 
         // Auto-Scan Navigation Mode (Every 3 seconds)
-        let isNavigationModeActive = false;
-        let navigationScanTimer = null;
+        var isNavigationModeActive = false;
+        var navigationScanTimer = null;
 
         // Goal-Based Target Tracking & Reach Guidance Mode
-        let activeFindTarget = null;
-        let isTargetTrackingMode = false;
-        let targetTrackingTimer = null;
+        var activeFindTarget = null;
+        var isTargetTrackingMode = false;
+        var targetTrackingTimer = null;
 
         // Live real-time perception loop
-        let liveTrackingInterval = null;
-        let latestDetections = [];
+        var liveTrackingInterval = null;
+        var latestDetections = [];
 
         const videoEl = document.getElementById('videoFeed');
         const canvasEl = document.getElementById('overlayCanvas');
@@ -1172,6 +1327,8 @@
                 guidanceCardBox.className = "guidance-box";
                 intentBadge.innerText = "Standby";
                 intentBadge.className = "guidance-badge";
+                if (voiceStatusText) voiceStatusText.innerText = isAlwaysListening ? "Voice: Always Listening" : "Voice: Paused";
+                if (voiceStatusPill) voiceStatusPill.className = isAlwaysListening ? "status-pill active-listening" : "status-pill";
             }
         }
 
@@ -1180,6 +1337,10 @@
             setTargetTrackingMode(null, false);
             window.speechSynthesis.cancel();
             guidanceTextEl.innerText = "Target tracking stopped. Standing by.";
+            const hudTagEl = document.getElementById('hudEngineTag');
+            if (hudTagEl) hudTagEl.innerText = "✨ AI Spatial Vision";
+            if (voiceStatusText) voiceStatusText.innerText = isAlwaysListening ? "Voice: Always Listening" : "Voice: Paused";
+            if (voiceStatusPill) voiceStatusPill.className = isAlwaysListening ? "status-pill active-listening" : "status-pill";
         }
 
         function runTargetReachTick() {
@@ -1441,9 +1602,6 @@
         // ==========================================
         // 7. ALWAYS-ON VOICE COMMAND LISTENER & AUDIO ARBITER (MOBILE STABILIZED)
         // ==========================================
-        let isAiSpeaking = false;
-        let isSpeechRecStarting = false;
-        let speechKeepAliveTimer = null;
 
         function triggerHaptic(pattern = [50]) {
             if (navigator.vibrate) {

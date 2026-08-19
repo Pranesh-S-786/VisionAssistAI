@@ -1,4 +1,4 @@
-const CACHE_NAME = 'visionassist-pwa-v3';
+const CACHE_NAME = 'visionassist-pwa-v4';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
