@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VisionAssist AI — Voice-First Spatial Accessibility Guide</title>
+    <title>VisionAssist AI — Hands-Free Voice & Spatial Accessibility Companion</title>
     
     <!-- PWA & Mobile Optimization -->
     <meta name="theme-color" content="#0a0e17">
@@ -42,6 +42,8 @@
             --radius-sm: 8px;
             --glow: 0 0 25px rgba(0, 242, 254, 0.25);
             --glow-red: 0 0 25px rgba(255, 51, 102, 0.4);
+            --glow-green: 0 0 20px rgba(0, 176, 155, 0.35);
+            --glow-gold: 0 0 25px rgba(246, 211, 101, 0.5);
         }
 
         body.high-contrast {
@@ -52,6 +54,7 @@
             --accent-blue: #00ffff;
             --accent-green: #00ff00;
             --accent-red: #ff0055;
+            --accent-amber: #ffaa00;
             --text-main: #ffffff;
             --text-muted: #e2e8f0;
             --border: #ffffff;
@@ -72,7 +75,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 16px 12px 30px;
+            padding: 14px 12px 28px;
             line-height: 1.5;
             overflow-x: hidden;
         }
@@ -83,11 +86,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 16px;
+            padding-bottom: 14px;
             border-bottom: 1px solid var(--border);
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
         .logo-group {
@@ -145,9 +148,16 @@
             transition: all 0.2s ease;
         }
 
-        .status-pill:hover {
-            border-color: var(--accent-cyan);
-            color: var(--text-main);
+        .status-pill.active-listening {
+            border-color: var(--accent-green);
+            color: #fff;
+            box-shadow: var(--glow-green);
+        }
+
+        .status-pill.tracking-active {
+            border-color: var(--accent-amber);
+            color: #fff;
+            box-shadow: var(--glow-gold);
         }
 
         .status-dot {
@@ -158,9 +168,20 @@
             box-shadow: 0 0 10px var(--accent-green);
         }
 
-        .status-dot.edge {
+        .status-dot.listening-pulse {
+            animation: pulse-dot 1.2s infinite;
+        }
+
+        .status-dot.target-pulse {
             background-color: var(--accent-amber);
             box-shadow: 0 0 10px var(--accent-amber);
+            animation: pulse-dot 0.8s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .icon-btn {
@@ -189,7 +210,7 @@
             max-width: 1200px;
             display: grid;
             grid-template-columns: 1.1fr 1fr;
-            gap: 20px;
+            gap: 18px;
         }
 
         @media (max-width: 920px) {
@@ -202,11 +223,11 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 18px;
+            padding: 16px;
             position: relative;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
         }
 
         .card-header {
@@ -230,7 +251,7 @@
         .camera-viewport {
             position: relative;
             width: 100%;
-            height: 340px;
+            height: 350px;
             background: #000;
             border-radius: var(--radius-md);
             overflow: hidden;
@@ -242,7 +263,7 @@
 
         @media (max-width: 600px) {
             .camera-viewport {
-                height: 290px;
+                height: 300px;
             }
         }
 
@@ -301,7 +322,7 @@
             background: var(--bg-secondary);
             color: var(--text-main);
             border: 1px solid var(--border);
-            padding: 9px 14px;
+            padding: 8px 14px;
             border-radius: var(--radius-md);
             cursor: pointer;
             font-size: 13px;
@@ -318,10 +339,6 @@
             border-color: var(--accent-cyan);
         }
 
-        .btn:active {
-            transform: scale(0.98);
-        }
-
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
             color: #000;
@@ -331,6 +348,16 @@
         .btn-primary:hover {
             box-shadow: var(--glow);
             filter: brightness(1.1);
+        }
+
+        .btn-target {
+            background: linear-gradient(135deg, var(--accent-amber), #ff9f43);
+            color: #000;
+            border: none;
+        }
+
+        .btn-target:hover {
+            box-shadow: var(--glow-gold);
         }
 
         .btn-danger {
@@ -344,44 +371,51 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 14px;
+            padding: 16px 14px;
             background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(19, 27, 46, 0.5) 100%);
             border-radius: var(--radius-md);
-            border: 1px dashed rgba(0, 242, 254, 0.3);
+            border: 1px solid rgba(0, 242, 254, 0.3);
             text-align: center;
-            gap: 12px;
+            gap: 10px;
+        }
+
+        .mic-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .mic-button {
-            width: 76px;
-            height: 76px;
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
             border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 30px;
             color: #000;
-            box-shadow: var(--glow);
+            box-shadow: var(--glow-green);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
         }
 
-        .mic-button:hover {
-            transform: scale(1.06);
+        .mic-button.always-listening {
+            animation: pulse-listening 1.8s infinite;
         }
 
-        .mic-button.listening {
-            background: linear-gradient(135deg, var(--accent-red), #ff758c);
-            animation: pulse-ring 1.4s infinite;
+        .mic-button.processing {
+            background: linear-gradient(135deg, var(--accent-amber), #ffa502);
+            animation: none;
         }
 
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); }
-            70% { box-shadow: 0 0 0 22px rgba(255, 51, 102, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); }
+        @keyframes pulse-listening {
+            0% { box-shadow: 0 0 0 0 rgba(0, 176, 155, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 176, 155, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 176, 155, 0); }
         }
 
         .speech-input-box {
@@ -396,7 +430,7 @@
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             color: #fff;
-            padding: 10px 14px;
+            padding: 9px 12px;
             font-size: 14px;
             outline: none;
         }
@@ -413,7 +447,7 @@
             text-transform: uppercase;
             color: var(--text-muted);
             letter-spacing: 0.8px;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .demo-grid {
@@ -470,9 +504,20 @@
         }
 
         .guidance-box.hazard-active {
-            background: linear-gradient(135deg, rgba(255, 51, 102, 0.15), rgba(255, 117, 140, 0.1));
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.18), rgba(255, 117, 140, 0.12));
             border-color: var(--accent-red);
             box-shadow: var(--glow-red);
+        }
+
+        .guidance-box.nav-mode-active {
+            border-color: var(--accent-green);
+            box-shadow: var(--glow-green);
+        }
+
+        .guidance-box.target-mode-active {
+            background: linear-gradient(135deg, rgba(246, 211, 101, 0.15), rgba(255, 159, 67, 0.1));
+            border-color: var(--accent-amber);
+            box-shadow: var(--glow-gold);
         }
 
         .guidance-header {
@@ -498,6 +543,11 @@
             color: #ffffff;
         }
 
+        .guidance-badge.target-badge {
+            background: var(--accent-amber);
+            color: #000000;
+        }
+
         .spoken-text-display {
             font-size: 18px;
             font-weight: 700;
@@ -516,7 +566,7 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 11px;
             color: #38bdf8;
-            max-height: 150px;
+            max-height: 140px;
             overflow-y: auto;
             white-space: pre-wrap;
         }
@@ -531,6 +581,8 @@
             padding: 8px 14px;
             border-radius: var(--radius-md);
             font-size: 13px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         /* Modal */
@@ -581,7 +633,7 @@
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
             padding: 12px 18px;
-            margin-top: 18px;
+            margin-top: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -611,10 +663,14 @@
             <div class="logo-badge">👁️</div>
             <div class="logo-title">
                 <h1>VisionAssist AI</h1>
-                <p>Voice-First Spatial Guide</p>
+                <p>Always-On Hands-Free Guide</p>
             </div>
         </div>
         <div class="header-actions">
+            <div class="status-pill active-listening" id="voiceStatusPill" onclick="toggleAlwaysListening()" title="Voice Command Listener is ALWAYS ON (click to pause/resume)">
+                <span class="status-dot listening-pulse" id="voiceDot"></span>
+                <span id="voiceStatusText">Voice: Always Listening</span>
+            </div>
             <div class="status-pill" id="engineStatusPill" onclick="openBackendModal()" title="Click to view & configure AI Backend or Edge AI">
                 <span class="status-dot edge" id="statusDot"></span>
                 <span id="backendStatus">AI: Initializing...</span>
@@ -630,10 +686,9 @@
         <section class="card">
             <div class="card-header">
                 <div class="card-title">
-                    <span>📹</span> Spatial Perception Viewport
+                    <span>📹</span> Live Environmental Perception
                 </div>
                 <div class="camera-controls">
-                    <button class="btn" id="btnToggleCam" onclick="toggleCamera()">Start Camera</button>
                     <button class="btn" id="btnSwitchCam" onclick="switchCameraFacing()" title="Switch between Front and Back camera">🔄 Flip Lens</button>
                     <button class="btn" id="btnTorch" onclick="toggleTorch()" style="display:none;" title="Toggle Flashlight / Torch">🔦 Torch</button>
                     <label class="btn" style="cursor:pointer;">
@@ -643,44 +698,48 @@
                 </div>
             </div>
 
-            <div class="camera-viewport">
-                <video id="videoFeed" autoplay playsinline muted style="display:none;"></video>
+            <div class="camera-viewport" id="viewportContainer" onclick="ensureCameraAndVoice()">
+                <video id="videoFeed" autoplay playsinline muted></video>
                 <img id="staticPreview" style="display:none;" alt="Preview">
                 <canvas id="overlayCanvas"></canvas>
                 
                 <div class="hud-overlay">
-                    <span class="hud-tag" id="hudEngineTag">🤖 Edge AI Ready</span>
-                    <span class="hud-tag" id="hudFpsTag">0 FPS</span>
+                    <span class="hud-tag" id="hudEngineTag">🤖 Live Perception Active</span>
+                    <span class="hud-tag" id="hudFpsTag">Live HUD</span>
                 </div>
 
-                <div id="noCamPlaceholder" style="color:var(--text-muted); text-align:center; padding: 20px;">
+                <div id="noCamPlaceholder" style="color:var(--text-muted); text-align:center; padding: 20px; display:none;">
                     <p style="font-size:44px; margin-bottom:8px;">📷</p>
-                    <p style="font-weight:700; font-size:16px;">Camera Inactive</p>
-                    <p style="font-size:13px; margin-top:4px;">Click <b>'Start Camera'</b> or upload an image to begin live spatial perception</p>
+                    <p style="font-weight:700; font-size:16px;">Tap to Activate Camera & Voice</p>
                 </div>
             </div>
 
-            <!-- Auto-Scan Continuous Navigation Toggle -->
+            <!-- Continuous Auto-Pilot Obstacle & Target Finder Watchdog -->
             <div class="auto-scan-row">
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span>🧭</span>
                     <div>
-                        <div style="font-weight:600;">Continuous Auto-Pilot</div>
-                        <div style="font-size:11px; color:var(--text-muted);">Real-time audio hazard warnings every 3s</div>
+                        <div style="font-weight:600;" id="scanBarTitle">Hands-Free Navigation & Target Locator</div>
+                        <div style="font-size:11px; color:var(--text-muted);" id="scanBarSubtitle">Say <b>"Help me find my bottle"</b> or <b>"Help me navigate"</b></div>
                     </div>
                 </div>
-                <button class="btn btn-sm" id="btnAutoScan" onclick="toggleAutoScan()">Enable Auto-Scan</button>
+                <div style="display:flex; gap:6px;">
+                    <button class="btn" id="btnAutoScan" onclick="toggleNavigationModeButton()">Navigation: OFF</button>
+                    <button class="btn btn-danger" id="btnStopTarget" onclick="cancelTargetTracking()" style="display:none;">Stop Finding ✕</button>
+                </div>
             </div>
 
             <!-- Speech & Command Center -->
             <div class="voice-zone">
-                <button class="mic-button" id="micBtn" onclick="toggleSpeechRecognition()" title="Click to speak (or press Space)">
-                    🎙️
-                </button>
+                <div class="mic-container">
+                    <button class="mic-button always-listening" id="micBtn" onclick="toggleAlwaysListening()" title="Voice is ALWAYS ON. Speak anytime!">
+                        🎙️
+                    </button>
+                </div>
                 <div>
-                    <div style="font-size:15px; font-weight:700;" id="micStatus">Click mic or press Spacebar to Speak</div>
+                    <div style="font-size:15px; font-weight:700;" id="micStatus">Always Listening: Speak your command naturally</div>
                     <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
-                        Try: "Is my path clear?", "Find my water bottle", "Read this text", "Where are my keys?"
+                        Try: "Help me find my water bottle", "Find my chair", "Help me navigate", "Read medicine"
                     </div>
                 </div>
 
@@ -703,42 +762,42 @@
             <!-- Primary Guidance Card -->
             <div class="guidance-box" id="guidanceCardBox">
                 <div class="guidance-header">
-                    <span class="guidance-badge" id="intentBadge">Awaiting Command</span>
-                    <span style="font-size:12px; color:var(--text-muted);" id="responseTime">0 ms</span>
+                    <span class="guidance-badge" id="intentBadge">Continuous Guard Active</span>
+                    <span style="font-size:12px; color:var(--text-muted);" id="responseTime">Live</span>
                 </div>
                 <div class="spoken-text-display" id="guidanceText">
-                    "VisionAssist ready. How can I help you navigate?"
+                    "VisionAssist active. Say 'Help me find my water bottle' to lock on and guide you to reach it."
                 </div>
             </div>
 
             <!-- 4 Quick-Action Presets -->
             <div class="demo-presets-title">Quick Action Scenarios</div>
             <div class="demo-grid">
-                <div class="preset-btn" onclick="runPreset('Is there any obstacle in front of me?')">
-                    <div class="preset-tag">Spatial Hazard Engine</div>
-                    <div class="preset-text">⚠️ "Is my path clear?"</div>
+                <div class="preset-btn" onclick="runPreset('Help me find my water bottle')">
+                    <div class="preset-tag">🎯 Goal Reach & Finder</div>
+                    <div class="preset-text">🔍 "Help me find bottle / chair"</div>
                 </div>
-                <div class="preset-btn" onclick="runPreset('Find my water bottle')">
-                    <div class="preset-tag">Perception & Locator</div>
-                    <div class="preset-text">🔍 "Find my bottle / chair"</div>
+                <div class="preset-btn" onclick="runPreset('Help me navigate')">
+                    <div class="preset-tag">🧭 3s Path Auto-Pilot</div>
+                    <div class="preset-text">🚶 "Help me navigate"</div>
                 </div>
-                <div class="preset-btn" onclick="runPreset('Read this text')">
-                    <div class="preset-tag">Text / Medicine OCR</div>
-                    <div class="preset-text">💊 "Read medicine / sign"</div>
+                <div class="preset-btn" onclick="runPreset('Read this medicine label')">
+                    <div class="preset-tag">💊 Text / OCR Reader</div>
+                    <div class="preset-text">📖 "Read medicine / sign"</div>
                 </div>
-                <div class="preset-btn" onclick="runPreset('Where did I leave my keys?')">
-                    <div class="preset-tag">Spatial Object Memory</div>
-                    <div class="preset-text">🧠 "Where are my keys?"</div>
+                <div class="preset-btn" onclick="runPreset('Where are my keys?')">
+                    <div class="preset-tag">🧠 Spatial Memory Recall</div>
+                    <div class="preset-text">🔑 "Where did I leave keys?"</div>
                 </div>
             </div>
 
             <!-- Context Inspector -->
-            <div style="margin-top: 4px;">
+            <div style="margin-top: 2px;">
                 <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:flex; justify-content:space-between;">
-                    <span>Context & Spatial Inference Stream</span>
+                    <span>Live Perception & Context Stream</span>
                     <span id="detectionCount" style="color:var(--accent-cyan)">0 detections</span>
                 </div>
-                <div class="json-viewer" id="jsonOutput">{ "status": "ready", "engine": "Edge & Cloud Ready" }</div>
+                <div class="json-viewer" id="jsonOutput">{ "status": "active", "camera": "always_on", "voice": "always_listening" }</div>
             </div>
         </section>
     </main>
@@ -816,17 +875,29 @@
         let isTfLoading = false;
 
         let webcamStream = null;
-        let currentFacingMode = "environment"; // default to back camera on phones
+        let currentFacingMode = "environment";
         let hasTorch = false;
         let torchActive = false;
         let trackRef = null;
 
         let speechRecognition = null;
-        let isListening = false;
+        let isAlwaysListening = true;
+        let isCurrentlyProcessing = false;
         let lastSpokenText = "VisionAssist ready.";
         let currentCapturedBase64 = null;
-        let isAutoScanning = false;
-        let autoScanInterval = null;
+
+        // Auto-Scan Navigation Mode (Every 3 seconds)
+        let isNavigationModeActive = false;
+        let navigationScanTimer = null;
+
+        // Goal-Based Target Tracking & Reach Guidance Mode
+        let activeFindTarget = null;
+        let isTargetTrackingMode = false;
+        let targetTrackingTimer = null;
+
+        // Live real-time perception loop
+        let liveTrackingInterval = null;
+        let latestDetections = [];
 
         const videoEl = document.getElementById('videoFeed');
         const canvasEl = document.getElementById('overlayCanvas');
@@ -839,8 +910,10 @@
         const micBtn = document.getElementById('micBtn');
         const micStatus = document.getElementById('micStatus');
         const textInput = document.getElementById('textCommand');
+        const voiceStatusPill = document.getElementById('voiceStatusPill');
+        const voiceStatusText = document.getElementById('voiceStatusText');
 
-        // Comprehensive Obstacle Catalog (covers indoor/outdoor furniture, obstacles, hazards, trip hazards)
+        // Comprehensive Obstacle Catalog
         const OBSTACLE_CLASSES = new Set([
             'bench', 'chair', 'dining table', 'table', 'couch', 'sofa', 'bed', 'stool', 'desk',
             'toilet', 'potted plant', 'pottedplant', 'suitcase', 'backpack', 'handbag', 'box',
@@ -850,22 +923,48 @@
             'sports ball', 'stairs', 'bottle', 'cup', 'bowl', 'laptop'
         ]);
 
+        const SYNONYM_MAP = {
+            'bottle': ['bottle', 'cup', 'vase', 'wine glass'],
+            'water bottle': ['bottle', 'cup', 'vase'],
+            'chair': ['chair', 'bench', 'couch', 'sofa', 'stool', 'seat'],
+            'seat': ['chair', 'bench', 'couch', 'sofa', 'stool'],
+            'bench': ['bench', 'chair', 'couch', 'sofa'],
+            'couch': ['couch', 'sofa', 'chair', 'bench'],
+            'sofa': ['couch', 'sofa', 'chair'],
+            'table': ['dining table', 'desk', 'table'],
+            'desk': ['dining table', 'desk', 'table'],
+            'phone': ['cell phone', 'phone', 'remote'],
+            'cell phone': ['cell phone', 'phone', 'remote'],
+            'mobile': ['cell phone', 'phone'],
+            'smartphone': ['cell phone', 'phone'],
+            'keys': ['keys', 'remote', 'cell phone'],
+            'computer': ['laptop', 'tv', 'keyboard'],
+            'laptop': ['laptop', 'tv', 'keyboard'],
+            'bag': ['backpack', 'handbag', 'suitcase'],
+            'backpack': ['backpack', 'handbag', 'suitcase'],
+            'cup': ['cup', 'bottle', 'bowl'],
+            'mug': ['cup', 'bottle'],
+            'person': ['person'],
+            'door': ['door', 'refrigerator']
+        };
+
         // Service Worker Registration for PWA
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration error:', err));
+            navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
         }
 
-        // Initialize Edge AI (TensorFlow COCO-SSD) in background
+        // Initialize Edge AI (TensorFlow COCO-SSD)
         async function initEdgeAiModel() {
             if (tfModel || isTfLoading) return;
             isTfLoading = true;
             try {
                 if (window.cocoSsd) {
                     tfModel = await cocoSsd.load();
-                    document.getElementById('hudEngineTag').innerText = "🤖 Edge AI Model Ready";
+                    document.getElementById('hudEngineTag').innerText = "🤖 Edge AI Active";
+                    startContinuousPerceptionLoop();
                 }
             } catch (e) {
-                console.log("Edge AI model load error:", e);
+                console.log("Edge AI load error:", e);
             } finally {
                 isTfLoading = false;
             }
@@ -878,9 +977,8 @@
             
             if (!API_URL) {
                 isBackendOnline = false;
-                statusEl.innerText = "Mode: Edge AI (Browser)";
+                statusEl.innerText = "Mode: Edge AI";
                 dotEl.className = "status-dot edge";
-                document.getElementById('hudEngineTag').innerText = "🤖 Edge AI (Standalone)";
                 initEdgeAiModel();
                 return;
             }
@@ -893,17 +991,16 @@
 
                 if (res.ok) {
                     isBackendOnline = true;
-                    statusEl.innerText = `Backend: Connected (YOLOv8)`;
+                    statusEl.innerText = `Backend: YOLOv8`;
                     dotEl.className = "status-dot";
-                    document.getElementById('hudEngineTag').innerText = "⚡ YOLOv8 Python Backend";
+                    document.getElementById('hudEngineTag').innerText = "⚡ YOLOv8 Backend";
                 } else {
-                    throw new Error("Bad response");
+                    throw new Error("Offline");
                 }
             } catch (e) {
                 isBackendOnline = false;
-                statusEl.innerText = "Mode: Edge AI (Browser)";
+                statusEl.innerText = "Mode: Edge AI";
                 dotEl.className = "status-dot edge";
-                document.getElementById('hudEngineTag').innerText = "🤖 Edge AI (Standalone)";
                 initEdgeAiModel();
             }
         }
@@ -911,19 +1008,13 @@
         checkBackendConnectivity();
 
         // ==========================================
-        // 2. CAMERA CONTROLS
+        // 2. ALWAYS-ON CAMERA CONTROLS
         // ==========================================
-        async function toggleCamera() {
-            if (webcamStream) {
-                stopCamera();
-            } else {
-                startCamera(currentFacingMode);
-            }
-        }
-
-        async function startCamera(facingMode) {
+        async function startCamera(facingMode = "environment") {
             try {
-                if (webcamStream) stopCamera();
+                if (webcamStream) {
+                    webcamStream.getTracks().forEach(t => t.stop());
+                }
 
                 const constraints = {
                     video: {
@@ -939,8 +1030,6 @@
                 videoEl.style.display = "block";
                 staticPreview.style.display = "none";
                 noCamPlaceholder.style.display = "none";
-                document.getElementById('btnToggleCam').innerText = "Stop Camera";
-                document.getElementById('btnToggleCam').classList.add('btn-danger');
 
                 trackRef = webcamStream.getVideoTracks()[0];
                 const capabilities = trackRef.getCapabilities ? trackRef.getCapabilities() : {};
@@ -958,31 +1047,17 @@
                     videoEl.style.transform = "none";
                 }
 
-            } catch (err) {
-                alert("Could not access camera: " + err.message + "\nPlease grant camera permission.");
-            }
-        }
+                startContinuousPerceptionLoop();
 
-        function stopCamera() {
-            if (webcamStream) {
-                webcamStream.getTracks().forEach(t => t.stop());
-                webcamStream = null;
-                trackRef = null;
+            } catch (err) {
+                console.log("Camera auto-start notice:", err.message);
+                noCamPlaceholder.style.display = "block";
             }
-            if (isAutoScanning) toggleAutoScan();
-            videoEl.style.display = "none";
-            noCamPlaceholder.style.display = "block";
-            document.getElementById('btnToggleCam').innerText = "Start Camera";
-            document.getElementById('btnToggleCam').classList.remove('btn-danger');
-            document.getElementById('btnTorch').style.display = "none";
-            clearCanvas();
         }
 
         async function switchCameraFacing() {
             currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
-            if (webcamStream) {
-                await startCamera(currentFacingMode);
-            }
+            await startCamera(currentFacingMode);
         }
 
         async function toggleTorch() {
@@ -998,44 +1073,158 @@
             }
         }
 
-        function clearCanvas() {
-            const ctx = canvasEl.getContext('2d');
-            ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                currentCapturedBase64 = e.target.result;
-                staticPreview.src = currentCapturedBase64;
-                staticPreview.style.display = "block";
-                videoEl.style.display = "none";
-                noCamPlaceholder.style.display = "none";
-                if (webcamStream) stopCamera();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function captureCurrentFrameBase64() {
-            if (webcamStream && videoEl.videoWidth) {
-                const capCanvas = document.createElement('canvas');
-                capCanvas.width = videoEl.videoWidth;
-                capCanvas.height = videoEl.videoHeight;
-                const ctx = capCanvas.getContext('2d');
-                if (currentFacingMode === "user") {
-                    ctx.translate(capCanvas.width, 0);
-                    ctx.scale(-1, 1);
-                }
-                ctx.drawImage(videoEl, 0, 0, capCanvas.width, capCanvas.height);
-                return capCanvas.toDataURL('image/jpeg', 0.85);
-            }
-            return currentCapturedBase64;
+        function ensureCameraAndVoice() {
+            if (!webcamStream) startCamera(currentFacingMode);
+            if (!isListening) startSpeechRecognitionLoop();
         }
 
         // ==========================================
-        // 3. BOUNDING BOXES & HUD RENDERING
+        // 3. TARGET LOCATOR & REACH GUIDANCE CONTROLLER
+        // ==========================================
+        function setTargetTrackingMode(targetName, enable) {
+            isTargetTrackingMode = enable;
+            activeFindTarget = enable ? targetName.toLowerCase().trim() : null;
+
+            if (targetTrackingTimer) {
+                clearInterval(targetTrackingTimer);
+                targetTrackingTimer = null;
+            }
+
+            const tagEl = document.getElementById('hudEngineTag');
+            const stopBtn = document.getElementById('btnStopTarget');
+
+            if (enable && activeFindTarget) {
+                tagEl.innerText = `🎯 Seeking: ${activeFindTarget}`;
+                stopBtn.style.display = "inline-flex";
+                guidanceCardBox.classList.add('target-mode-active');
+                guidanceCardBox.classList.remove('nav-mode-active');
+                if (!webcamStream) startCamera(currentFacingMode);
+
+                // Start 2.5s continuous reach guidance loop
+                targetTrackingTimer = setInterval(() => {
+                    if (webcamStream && !isCurrentlyProcessing && isTargetTrackingMode && activeFindTarget) {
+                        executeAssist(`Help me reach my ${activeFindTarget}`);
+                    }
+                }, 2500);
+            } else {
+                tagEl.innerText = "🤖 Edge AI Active";
+                stopBtn.style.display = "none";
+                guidanceCardBox.classList.remove('target-mode-active');
+            }
+        }
+
+        function cancelTargetTracking() {
+            const prev = activeFindTarget;
+            setTargetTrackingMode(null, false);
+            speak(`Stopped search${prev ? ' for ' + prev : ''}. Standing by.`);
+        }
+
+        // ==========================================
+        // 4. NAVIGATION MODE CONTROLLER (3-SECOND AUTO-SCAN)
+        // ==========================================
+        function setNavigationMode(enable) {
+            isNavigationModeActive = enable;
+            const btn = document.getElementById('btnAutoScan');
+
+            if (navigationScanTimer) {
+                clearInterval(navigationScanTimer);
+                navigationScanTimer = null;
+            }
+
+            if (enable) {
+                // If target mode was active, switch to general navigation
+                if (isTargetTrackingMode) setTargetTrackingMode(null, false);
+
+                btn.innerText = "Navigation: ON (3s)";
+                btn.className = "btn btn-primary";
+                guidanceCardBox.classList.add('nav-mode-active');
+                guidanceCardBox.classList.remove('target-mode-active');
+                if (!webcamStream) startCamera(currentFacingMode);
+
+                // Run immediately then scan every 3 seconds
+                executeAssist("Is my path clear?");
+                navigationScanTimer = setInterval(() => {
+                    if (webcamStream && !isCurrentlyProcessing && isNavigationModeActive) {
+                        executeAssist("Is my path clear?");
+                    }
+                }, 3000);
+            } else {
+                btn.innerText = "Navigation: OFF";
+                btn.className = "btn";
+                guidanceCardBox.classList.remove('nav-mode-active');
+            }
+        }
+
+        function toggleNavigationModeButton() {
+            setNavigationMode(!isNavigationModeActive);
+            if (isNavigationModeActive) {
+                speak("Navigation mode activated. Continuously scanning your path every 3 seconds.");
+            } else {
+                speak("Navigation mode deactivated. Auto scan stopped.");
+            }
+        }
+
+        // ==========================================
+        // 5. CONTINUOUS PERCEPTION LOOP
+        // ==========================================
+        function startContinuousPerceptionLoop() {
+            if (liveTrackingInterval) clearInterval(liveTrackingInterval);
+
+            liveTrackingInterval = setInterval(async () => {
+                if (!tfModel || !webcamStream || !videoEl.videoWidth || isCurrentlyProcessing) return;
+
+                try {
+                    const predictions = await tfModel.detect(videoEl);
+                    const w = videoEl.videoWidth || 640;
+                    const h = videoEl.videoHeight || 480;
+
+                    latestDetections = predictions.map(p => {
+                        const [x, y, bw, bh] = p.bbox;
+                        const centerX = x + bw / 2;
+                        const centerY = y + bh / 2;
+                        const areaRatio = (bw * bh) / (w * h);
+
+                        let pos = "in front of you";
+                        if (centerX < w * 0.35) {
+                            pos = "on your left";
+                        } else if (centerX > w * 0.65) {
+                            pos = "on your right";
+                        } else {
+                            pos = "straight ahead in your path";
+                        }
+
+                        const distEst = (Math.round((1.0 / (Math.max(bh / h, 0.12))) * 0.6 * 10) / 10).toFixed(1);
+                        const isKnownObstacleClass = OBSTACLE_CLASSES.has(p.class.toLowerCase());
+                        const isLargeInFrame = areaRatio > 0.06;
+                        const isInWalkingCorridor = (centerX >= w * 0.2 && centerX <= w * 0.8) && (y + bh >= h * 0.35);
+                        const isCloseProximity = parseFloat(distEst) <= 2.8;
+
+                        const isObstacle = (isKnownObstacleClass || isLargeInFrame) && (isInWalkingCorridor || isCloseProximity);
+
+                        return {
+                            class: p.class,
+                            score: Math.round(p.score * 100),
+                            bbox: [Math.round(x), Math.round(y), Math.round(x + bw), Math.round(y + bh)],
+                            position: pos,
+                            centerX: centerX,
+                            centerY: centerY,
+                            areaRatio: areaRatio,
+                            distance_m: distEst,
+                            is_obstacle: isObstacle
+                        };
+                    });
+
+                    drawBoundingBoxes(latestDetections);
+                    document.getElementById('detectionCount').innerText = `${latestDetections.length} live objects`;
+
+                } catch (e) {
+                    console.log("Live loop step notice:", e);
+                }
+            }, 300);
+        }
+
+        // ==========================================
+        // 6. BOUNDING BOX & TARGET HUD RENDERING
         // ==========================================
         function drawBoundingBoxes(detections) {
             const ctx = canvasEl.getContext('2d');
@@ -1060,28 +1249,63 @@
 
                 const bw = x2 - x1;
                 const bh = y2 - y1;
-                const isHazard = det.is_obstacle === true || det.is_hazard === true;
+                const isHazard = det.is_obstacle === true;
+                
+                // Check if this object is the active search target
+                let isTargetMatch = false;
+                if (activeFindTarget) {
+                    const variants = SYNONYM_MAP[activeFindTarget] || [activeFindTarget];
+                    isTargetMatch = variants.some(v => det.class.toLowerCase().includes(v) || v.includes(det.class.toLowerCase()));
+                }
 
-                // Bounding Box
-                ctx.strokeStyle = isHazard ? "#ff3366" : "#00f2fe";
-                ctx.lineWidth = isHazard ? 4 : 3;
-                ctx.strokeRect(x1, y1, bw, bh);
+                if (isTargetMatch) {
+                    // Glowing Gold Target Lock Box
+                    ctx.strokeStyle = "#f6d365";
+                    ctx.lineWidth = 5;
+                    ctx.strokeRect(x1, y1, bw, bh);
 
-                // Label Background
-                ctx.fillStyle = isHazard ? "rgba(255, 51, 102, 0.95)" : "rgba(0, 242, 254, 0.9)";
-                const label = `${isHazard ? '⚠️ ' : ''}${det.class || 'object'} (${det.position || ''}, ~${det.distance_m || '?'}m)`;
-                ctx.font = "bold 15px Outfit, sans-serif";
-                const textWidth = ctx.measureText(label).width;
-                ctx.fillRect(x1, y1 > 26 ? y1 - 26 : y1, textWidth + 14, 26);
+                    // Crosshair / Target reticle at center
+                    const cx = x1 + bw / 2;
+                    const cy = y1 + bh / 2;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+                    ctx.strokeStyle = "#f6d365";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
 
-                // Label Text
-                ctx.fillStyle = "#ffffff";
-                ctx.fillText(label, x1 + 6, y1 > 26 ? y1 - 8 : y1 + 18);
+                    // Label Background
+                    ctx.fillStyle = "rgba(246, 211, 101, 0.95)";
+                    const label = `🎯 TARGET: ${det.class} (${det.position}, ~${det.distance_m}m)`;
+                    ctx.font = "bold 16px Outfit, sans-serif";
+                    const textWidth = ctx.measureText(label).width;
+                    ctx.fillRect(x1, y1 > 30 ? y1 - 30 : y1, textWidth + 16, 30);
+
+                    // Label Text
+                    ctx.fillStyle = "#000000";
+                    ctx.fillText(label, x1 + 8, y1 > 30 ? y1 - 8 : y1 + 20);
+
+                } else {
+                    // Regular Bounding Box (Red for hazard, Cyan for neutral)
+                    ctx.strokeStyle = isHazard ? "#ff3366" : "#00f2fe";
+                    ctx.lineWidth = isHazard ? 4 : 3;
+                    ctx.strokeRect(x1, y1, bw, bh);
+
+                    // Label Background
+                    ctx.fillStyle = isHazard ? "rgba(255, 51, 102, 0.95)" : "rgba(0, 242, 254, 0.9)";
+                    const label = `${isHazard ? '⚠️ ' : ''}${det.class || 'object'} (${det.position || ''}, ~${det.distance_m || '?'}m)`;
+                    ctx.font = "bold 15px Outfit, sans-serif";
+                    const textWidth = ctx.measureText(label).width;
+                    ctx.fillRect(x1, y1 > 26 ? y1 - 26 : y1, textWidth + 14, 26);
+
+                    // Label Text
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillText(label, x1 + 6, y1 > 26 ? y1 - 8 : y1 + 18);
+                }
             });
         }
 
         // ==========================================
-        // 4. SPEECH SYNTHESIS & RECOGNITION (TTS / STT)
+        // 7. ALWAYS-ON VOICE COMMAND LISTENER (STT & TTS)
         // ==========================================
         function triggerHaptic(pattern = [50]) {
             if (navigator.vibrate) {
@@ -1104,63 +1328,83 @@
             speak(lastSpokenText);
         }
 
-        // STT Setup with Cross-Device Web Speech API
+        // Speech-to-Text Setup with Continuous Automatic Restart
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRec) {
             speechRecognition = new SpeechRec();
-            speechRecognition.continuous = false;
+            speechRecognition.continuous = true;
             speechRecognition.interimResults = false;
             speechRecognition.lang = 'en-US';
 
             speechRecognition.onstart = () => {
                 isListening = true;
-                micBtn.classList.add('listening');
-                micStatus.innerText = "Listening... Speak now";
-                triggerHaptic([40]);
+                micBtn.classList.add('always-listening');
+                voiceStatusPill.classList.add('active-listening');
+                voiceStatusText.innerText = isTargetTrackingMode ? `Seeking: ${activeFindTarget}` : "Voice: Always Listening";
+                micStatus.innerText = "Listening continuously: Speak your command anytime";
             };
 
             speechRecognition.onresult = (e) => {
-                const transcript = e.results[0][0].transcript;
-                textInput.value = transcript;
-                micStatus.innerText = `Heard: "${transcript}"`;
-                triggerHaptic([40, 30]);
-                executeAssist(transcript);
+                const results = e.results;
+                const latestResult = results[results.length - 1];
+                if (latestResult.isFinal) {
+                    const transcript = latestResult[0].transcript.trim();
+                    if (transcript.length > 1) {
+                        textInput.value = transcript;
+                        micStatus.innerText = `Heard: "${transcript}"`;
+                        triggerHaptic([40, 30]);
+                        executeAssist(transcript);
+                    }
+                }
             };
 
             speechRecognition.onerror = (e) => {
-                console.error("STT Error:", e);
-                isListening = false;
-                micBtn.classList.remove('listening');
-                micStatus.innerText = "Voice input error. Please type command.";
+                console.log("Speech listener notice:", e.error);
+                if (isAlwaysListening && e.error !== 'aborted') {
+                    setTimeout(() => startSpeechRecognitionLoop(), 800);
+                }
             };
 
             speechRecognition.onend = () => {
                 isListening = false;
-                micBtn.classList.remove('listening');
+                if (isAlwaysListening) {
+                    setTimeout(() => startSpeechRecognitionLoop(), 300);
+                } else {
+                    micBtn.classList.remove('always-listening');
+                    voiceStatusPill.classList.remove('active-listening');
+                    voiceStatusText.innerText = "Voice: Paused";
+                    micStatus.innerText = "Voice paused. Tap mic to resume.";
+                }
             };
         }
 
-        function toggleSpeechRecognition() {
-            if (!speechRecognition) {
-                alert("Speech recognition not supported in this browser. Please type your query in the text box.");
-                return;
-            }
-            if (isListening) {
-                speechRecognition.stop();
-            } else {
+        function startSpeechRecognitionLoop() {
+            if (!speechRecognition) return;
+            try {
                 speechRecognition.start();
+            } catch (e) {}
+        }
+
+        function toggleAlwaysListening() {
+            isAlwaysListening = !isAlwaysListening;
+            if (isAlwaysListening) {
+                startSpeechRecognitionLoop();
+                triggerHaptic([50]);
+            } else {
+                if (speechRecognition) speechRecognition.stop();
+                triggerHaptic([30]);
             }
         }
 
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space' && document.activeElement !== textInput) {
                 e.preventDefault();
-                toggleSpeechRecognition();
+                toggleAlwaysListening();
             }
         });
 
         // ==========================================
-        // 5. IN-BROWSER SPATIAL MEMORY ENGINE
+        // 8. SPATIAL MEMORY ENGINE
         // ==========================================
         function getLocalMemory() {
             try {
@@ -1187,7 +1431,7 @@
 
         function recallLocalMemory(queryTarget) {
             const mems = getLocalMemory();
-            const cleanTarget = queryTarget.toLowerCase().replace(/^(my|the|a)\s+/, '').trim();
+            const cleanTarget = queryTarget.toLowerCase().replace(/^(my|the|a|an)\s+/, '').trim();
             const match = mems.find(m => m.object_name.includes(cleanTarget) || cleanTarget.includes(m.object_name));
             if (match) {
                 const nearbyText = match.nearby && match.nearby.length > 0 ? ` near the ${match.nearby.join(', ')}` : "";
@@ -1204,14 +1448,50 @@
         }
 
         // ==========================================
-        // 6. IN-BROWSER EDGE AI PERCEPTION & REASONING ENGINE
+        // 9. IN-BROWSER EDGE AI PIPELINE WITH TARGET REACH GUIDANCE
         // ==========================================
         async function runEdgeAiPipeline(intentText, imageBase64) {
             const t = intentText.toLowerCase();
 
-            // 1. Spatial Memory Recall
-            if (t.includes('where') || t.includes('remember') || t.includes('recall') || t.includes('leave') || t.includes('left')) {
-                const target = t.replace(/^(?:where\s+is|where\s+are|where\'s|where\s+did\s+i\s+leave)(?:\s+my|\s+the|\s+a)?\s+/i, '').replace(/[?.!]/g, '').trim();
+            // 0. Voice Stop / Cancel Search & Navigation
+            if (t.includes('stop finding') || t.includes('cancel search') || t.includes('stop search') || 
+                t.includes('stop tracking') || t.includes('found it') || t.includes('exit search') || 
+                t.includes('stop reach') || t.includes('exit target')) {
+                const prev = activeFindTarget;
+                setTargetTrackingMode(null, false);
+                return {
+                    intent: "stop_finding",
+                    spoken_response: `Stopped search${prev ? ' for ' + prev : ''}. Standing by.`,
+                    raw_data: { target_tracking: false }
+                };
+            }
+
+            // 1. Navigation Mode Voice Control (3-Second Auto-Scan)
+            if (t.includes('help me navigate') || t.includes('start navigation') || t.includes('navigation mode') || 
+                t.includes('start auto scan') || t.includes('guide my walking') || t.includes('start walking') || 
+                t.includes('navigate me') || t.includes('turn on navigation') || t.begin navigation) {
+                setNavigationMode(true);
+                return {
+                    intent: "navigation_mode_on",
+                    spoken_response: "Navigation mode activated. Continuously scanning your path every 3 seconds.",
+                    raw_data: { navigation_mode: true, interval_ms: 3000 }
+                };
+            }
+
+            if (t.includes('get out of navigation') || t.includes('exit navigation') || t.includes('stop navigation') || 
+                t.includes('stop navigating') || t.includes('turn off navigation') || t.includes('stop auto scan') || 
+                t.includes('stop walking') || t.includes('cancel navigation') || t.includes('end navigation')) {
+                setNavigationMode(false);
+                return {
+                    intent: "navigation_mode_off",
+                    spoken_response: "Navigation mode deactivated. Auto-scan stopped.",
+                    raw_data: { navigation_mode: false }
+                };
+            }
+
+            // 2. Spatial Memory Recall
+            if (t.includes('where did i leave') || t.includes('where did i put') || t.includes('remember') || t.includes('recall') || t.includes('leave') || t.includes('left')) {
+                const target = t.replace(/^(?:where\s+did\s+i\s+leave|where\s+did\s+i\s+put|remember|recall)(?:\s+my|\s+the|\s+a)?\s+/i, '').replace(/[?.!]/g, '').trim();
                 const mem = recallLocalMemory(target);
                 return {
                     intent: "recall_memory",
@@ -1220,7 +1500,7 @@
                 };
             }
 
-            // 2. OCR Text Reading
+            // 3. OCR Text Reading
             if (t.includes('read') || t.includes('text') || t.includes('label') || t.includes('medicine') || t.includes('sign')) {
                 if (window.Tesseract && imageBase64) {
                     try {
@@ -1239,66 +1519,58 @@
                 }
                 return {
                     intent: "read_text",
-                    spoken_response: "Could not clearly read text in frame. Please hold the item closer and steady.",
+                    spoken_response: "Could not clearly read text. Please hold the item closer and steady.",
                     raw_data: { extracted_text: "" }
                 };
             }
 
-            // 3. Object Detection & Spatial Perception via TensorFlow.js COCO-SSD
-            if (!tfModel && window.cocoSsd) {
-                try { tfModel = await cocoSsd.load(); } catch (e) {}
-            }
+            // Use latest live detections or run fresh inference
+            let detections = [...latestDetections];
 
-            let detections = [];
-            const sourceEl = (webcamStream && videoEl.videoWidth) ? videoEl : (staticPreview.style.display !== 'none' ? staticPreview : null);
+            if (detections.length === 0 && tfModel) {
+                const sourceEl = (webcamStream && videoEl.videoWidth) ? videoEl : (staticPreview.style.display !== 'none' ? staticPreview : null);
+                if (sourceEl) {
+                    try {
+                        const predictions = await tfModel.detect(sourceEl);
+                        const w = sourceEl.videoWidth || sourceEl.naturalWidth || 640;
+                        const h = sourceEl.videoHeight || sourceEl.naturalHeight || 480;
 
-            if (tfModel && sourceEl) {
-                try {
-                    const predictions = await tfModel.detect(sourceEl);
-                    const w = sourceEl.videoWidth || sourceEl.naturalWidth || 640;
-                    const h = sourceEl.videoHeight || sourceEl.naturalHeight || 480;
+                        detections = predictions.map(p => {
+                            const [x, y, bw, bh] = p.bbox;
+                            const centerX = x + bw / 2;
+                            const centerY = y + bh / 2;
+                            const areaRatio = (bw * bh) / (w * h);
 
-                    detections = predictions.map(p => {
-                        const [x, y, bw, bh] = p.bbox;
-                        const centerX = x + bw / 2;
-                        const centerY = y + bh / 2;
-                        const areaRatio = (bw * bh) / (w * h);
+                            let pos = "in front of you";
+                            if (centerX < w * 0.35) {
+                                pos = "on your left";
+                            } else if (centerX > w * 0.65) {
+                                pos = "on your right";
+                            } else {
+                                pos = "straight ahead in your path";
+                            }
 
-                        // Horizontal Sector
-                        let pos = "in front of you";
-                        if (centerX < w * 0.35) {
-                            pos = "on your left";
-                        } else if (centerX > w * 0.65) {
-                            pos = "on your right";
-                        } else {
-                            pos = "straight ahead in your path";
-                        }
+                            const distEst = (Math.round((1.0 / (Math.max(bh / h, 0.12))) * 0.6 * 10) / 10).toFixed(1);
+                            const isKnownObstacleClass = OBSTACLE_CLASSES.has(p.class.toLowerCase());
+                            const isLargeInFrame = areaRatio > 0.06;
+                            const isInWalkingCorridor = (centerX >= w * 0.2 && centerX <= w * 0.8) && (y + bh >= h * 0.35);
+                            const isCloseProximity = parseFloat(distEst) <= 2.8;
 
-                        // Robust Distance Estimation based on bounding box size & height
-                        const distEst = (Math.round((1.0 / (Math.max(bh / h, 0.12))) * 0.6 * 10) / 10).toFixed(1);
+                            const isObstacle = (isKnownObstacleClass || isLargeInFrame) && (isInWalkingCorridor || isCloseProximity);
 
-                        // Robust Obstacle Determination
-                        const isKnownObstacleClass = OBSTACLE_CLASSES.has(p.class.toLowerCase());
-                        const isLargeInFrame = areaRatio > 0.06;
-                        const isInWalkingCorridor = (centerX >= w * 0.2 && centerX <= w * 0.8) && (y + bh >= h * 0.35);
-                        const isCloseProximity = parseFloat(distEst) <= 2.8;
-
-                        const isObstacle = (isKnownObstacleClass || isLargeInFrame) && (isInWalkingCorridor || isCloseProximity);
-
-                        return {
-                            class: p.class,
-                            score: Math.round(p.score * 100),
-                            bbox: [Math.round(x), Math.round(y), Math.round(x + bw), Math.round(y + bh)],
-                            position: pos,
-                            centerX: centerX,
-                            centerY: centerY,
-                            areaRatio: areaRatio,
-                            distance_m: distEst,
-                            is_obstacle: isObstacle
-                        };
-                    });
-                } catch (err) {
-                    console.log("Detection error:", err);
+                            return {
+                                class: p.class,
+                                score: Math.round(p.score * 100),
+                                bbox: [Math.round(x), Math.round(y), Math.round(x + bw), Math.round(y + bh)],
+                                position: pos,
+                                centerX: centerX,
+                                centerY: centerY,
+                                areaRatio: areaRatio,
+                                distance_m: distEst,
+                                is_obstacle: isObstacle
+                            };
+                        });
+                    } catch (err) {}
                 }
             }
 
@@ -1310,24 +1582,94 @@
                 });
             }
 
-            // ====================================================
-            // 4. SMART HAZARD REASONING ENGINE (Obstacle Checking)
-            // ====================================================
+            // 4. Goal-Based Target Finding & Reach Guidance Engine: "Help me find [x]" / "Find my [x]" / "Where is [x]"
+            const isFindIntent = t.includes('find') || t.includes('locate') || t.includes('reach') || 
+                                 t.includes('guide me to') || t.includes('take me to') || 
+                                 t.includes('where is') || t.includes('where are') || (isTargetTrackingMode && activeFindTarget);
+
+            if (isFindIntent) {
+                let target = t.replace(/^(?:can\s+you\s+)?(?:please\s+)?(?:help\s+me\s+)?(?:find|locate|reach|guide\s+me\s+to|take\s+me\s+to|search\s+for)(?:\s+my|\s+the|\s+a|\s+an)?\s+/i, '')
+                             .replace(/^(?:where\s+is|where\s+are|where\'s)(?:\s+my|\s+the|\s+a|\s+an)?\s+/i, '')
+                             .replace(/(?:\s+in\s+my\s+way|\s+in\s+the\s+room|\s+around\s+here|[?.!])/gi, '')
+                             .trim();
+
+                if (!target && activeFindTarget) target = activeFindTarget;
+
+                if (target) {
+                    activeFindTarget = target;
+                    if (!isTargetTrackingMode) {
+                        setTargetTrackingMode(target, true);
+                    }
+
+                    const targetVariants = SYNONYM_MAP[target] || [target];
+                    const matched = detections.find(d => 
+                        targetVariants.some(v => d.class.toLowerCase().includes(v) || v.includes(d.class.toLowerCase()))
+                    );
+
+                    if (matched) {
+                        const dist = parseFloat(matched.distance_m);
+                        const w = videoEl.videoWidth || 640;
+                        let dirAdvice = "";
+
+                        if (matched.centerX < w * 0.35) {
+                            dirAdvice = "Turn slightly to your left.";
+                        } else if (matched.centerX > w * 0.65) {
+                            dirAdvice = "Turn slightly to your right.";
+                        } else {
+                            dirAdvice = "Move straight forward.";
+                        }
+
+                        // Reached Destination threshold (< 0.65m or prominent in view)
+                        if (dist <= 0.65 || matched.areaRatio > 0.18) {
+                            triggerHaptic([100, 50, 100, 50, 250]);
+                            setTargetTrackingMode(null, false); // Target reached!
+                            return {
+                                intent: "target_reached",
+                                spoken_response: `You have reached your ${matched.class}! It is directly in front of you. Reach out your hand to grab it.`,
+                                raw_data: { found: true, reached: true, target: target, bbox: matched.bbox, all_detections: detections }
+                            };
+                        }
+
+                        // Interactive Reach Guidance
+                        triggerHaptic([60, 40]);
+                        return {
+                            intent: "target_guidance",
+                            spoken_response: `${matched.class} detected ${matched.position}, about ${matched.distance_m} meters away. ${dirAdvice}`,
+                            raw_data: { found: true, reached: false, target: target, bbox: matched.bbox, all_detections: detections }
+                        };
+                    }
+
+                    // Not yet visible in current camera angle: check memory
+                    const mem = recallLocalMemory(target);
+                    if (mem.found) {
+                        return {
+                            intent: "target_memory_hint",
+                            spoken_response: `Scanning for ${target}... I recall seeing it ${mem.match.location}. Please slowly pan your camera towards the ${mem.match.location}.`,
+                            raw_data: { found: false, memory_hint: mem.match, all_detections: detections }
+                        };
+                    }
+
+                    return {
+                        intent: "searching_target",
+                        spoken_response: `Scanning surroundings for your ${target}... Please slowly pan your camera around the room to locate it.`,
+                        raw_data: { found: false, searching: true, target: target, all_detections: detections }
+                    };
+                }
+            }
+
+            // 5. Hazard Intent
             const isHazardIntent = t.includes('hazard') || t.includes('obstacle') || t.includes('safe') || 
                                    t.includes('path') || t.includes('clear') || t.includes('walk') || 
-                                   t.includes('ahead') || t.includes('front') || t.includes('navigate');
+                                   t.includes('ahead') || t.includes('front');
 
             if (isHazardIntent) {
-                // Filter all active obstacles
                 const hazards = detections.filter(d => d.is_obstacle);
 
                 if (hazards.length > 0) {
-                    // Sort by closest distance
                     hazards.sort((a, b) => parseFloat(a.distance_m) - parseFloat(b.distance_m));
                     const primary = hazards[0];
+                    const w = videoEl.videoWidth || 640;
 
-                    // Spatial Evading Calculation
-                    const w = sourceEl ? (sourceEl.videoWidth || sourceEl.naturalWidth || 640) : 640;
                     const centerObstacles = hazards.filter(h => h.centerX >= w * 0.3 && h.centerX <= w * 0.7);
                     const leftObstacles = hazards.filter(h => h.centerX < w * 0.4);
                     const rightObstacles = hazards.filter(h => h.centerX > w * 0.6);
@@ -1339,7 +1681,7 @@
                         } else if (rightObstacles.length === 0) {
                             evasionAdvice = " Please step or steer to your right.";
                         } else {
-                            evasionAdvice = " Please stop, path is heavily obstructed.";
+                            evasionAdvice = " Please stop, path is obstructed.";
                         }
                     } else if (leftObstacles.length > 0 && rightObstacles.length === 0) {
                         evasionAdvice = " Keep slightly to your right.";
@@ -1347,7 +1689,6 @@
                         evasionAdvice = " Keep slightly to your left.";
                     }
 
-                    // Build spoken response
                     let spoken = "";
                     if (hazards.length === 1) {
                         spoken = `Caution: ${primary.class} detected ${primary.position}, about ${primary.distance_m} meters ahead.${evasionAdvice}`;
@@ -1356,7 +1697,7 @@
                         spoken = `Caution: ${primary.class} directly ${primary.position} at ${primary.distance_m}m, and ${otherNames} nearby.${evasionAdvice}`;
                     }
 
-                    triggerHaptic([150, 70, 150]); // Strong hazard pulse
+                    triggerHaptic([150, 70, 150]);
 
                     return {
                         intent: "hazard_check",
@@ -1372,7 +1713,7 @@
                 } else if (detections.length > 0) {
                     return {
                         intent: "hazard_check",
-                        spoken_response: "Your path is clear. Detected " + detections.map(d => d.class).join(', ') + " safely out of your direct way.",
+                        spoken_response: "Your path is clear. Detected " + detections.map(d => d.class).join(', ') + " safely to the side.",
                         raw_data: { path_clear: true, hazards_detected: [], all_detections: detections }
                     };
                 } else {
@@ -1384,66 +1725,62 @@
                 }
             }
 
-            // ====================================================
-            // 5. OBJECT FINDER & LOCATOR ENGINE
-            // ====================================================
-            const target = t.replace(/^(?:can\s+you\s+)?(?:please\s+)?find(?:\s+my|\s+the|\s+a)?\s+/i, '')
-                            .replace(/^(?:where\s+is|where\s+are|locate|search\s+for)(?:\s+my|\s+the|\s+a)?\s+/i, '')
-                            .replace(/[?.!]/g, '').trim();
-
-            const synonymMap = {
-                'bottle': ['bottle', 'cup', 'vase', 'wine glass'],
-                'chair': ['chair', 'bench', 'couch', 'sofa', 'stool'],
-                'bench': ['bench', 'chair', 'couch', 'sofa'],
-                'phone': ['cell phone', 'phone', 'remote'],
-                'computer': ['laptop', 'tv', 'keyboard'],
-                'bag': ['backpack', 'handbag', 'suitcase']
+            // Default Fallback
+            return {
+                intent: "general_perception",
+                spoken_response: detections.length > 0 ? "I see " + detections.map(d => d.class).join(', ') + " in your surroundings." : "Surroundings look clear. What would you like to find or navigate to?",
+                raw_data: { all_detections: detections }
             };
-
-            const targetVariants = synonymMap[target] || [target];
-            const matched = detections.find(d => 
-                targetVariants.some(v => d.class.toLowerCase().includes(v) || v.includes(d.class.toLowerCase()))
-            );
-
-            if (matched) {
-                return {
-                    intent: "find_object",
-                    spoken_response: `Found ${matched.class} ${matched.position}, approximately ${matched.distance_m} meters away.`,
-                    raw_data: { found: true, target: target, bbox: matched.bbox, all_detections: detections }
-                };
-            } else if (detections.length > 0) {
-                return {
-                    intent: "find_object",
-                    spoken_response: `I don't see your ${target}, but I detect ${detections.map(d => d.class).join(', ')} in the room.`,
-                    raw_data: { found: false, all_detections: detections }
-                };
-            } else {
-                return {
-                    intent: "find_object",
-                    spoken_response: `Scanning environment... No ${target} detected in current view.`,
-                    raw_data: { found: false, all_detections: [] }
-                };
-            }
         }
 
         // ==========================================
-        // 7. UNIFIED EXECUTION GATEWAY (HYBRID ROUTER)
+        // 10. UNIFIED EXECUTION GATEWAY
         // ==========================================
+        function captureCurrentFrameBase64() {
+            if (webcamStream && videoEl.videoWidth) {
+                const capCanvas = document.createElement('canvas');
+                capCanvas.width = videoEl.videoWidth;
+                capCanvas.height = videoEl.videoHeight;
+                const ctx = capCanvas.getContext('2d');
+                if (currentFacingMode === "user") {
+                    ctx.translate(capCanvas.width, 0);
+                    ctx.scale(-1, 1);
+                }
+                ctx.drawImage(videoEl, 0, 0, capCanvas.width, capCanvas.height);
+                return capCanvas.toDataURL('image/jpeg', 0.85);
+            }
+            return currentCapturedBase64;
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentCapturedBase64 = e.target.result;
+                staticPreview.src = currentCapturedBase64;
+                staticPreview.style.display = "block";
+                videoEl.style.display = "none";
+                noCamPlaceholder.style.display = "none";
+            };
+            reader.readAsDataURL(file);
+        }
+
         async function executeAssist(customQuery = null) {
             const query = customQuery || textInput.value.trim();
-            if (!query) return;
+            if (!query || isCurrentlyProcessing) return;
 
+            isCurrentlyProcessing = true;
+            micBtn.classList.add('processing');
             triggerHaptic([30]);
+
             const startTime = performance.now();
             guidanceTextEl.innerText = "Analyzing surroundings & spatial hazards...";
             intentBadge.innerText = "Processing";
-            intentBadge.classList.remove('hazard-badge');
-            guidanceCardBox.classList.remove('hazard-active');
 
             const imageBase64 = captureCurrentFrameBase64();
             let data = null;
 
-            // Route to Python backend if connected, otherwise execute In-Browser Edge AI
             if (isBackendOnline && API_URL) {
                 try {
                     const response = await fetch(`${API_URL}/assist`, {
@@ -1460,7 +1797,6 @@
                         throw new Error("Backend error");
                     }
                 } catch (err) {
-                    console.log("Backend offline, executing Edge AI:", err);
                     data = await runEdgeAiPipeline(query, imageBase64);
                 }
             } else {
@@ -1469,32 +1805,45 @@
 
             const latency = Math.round(performance.now() - startTime);
             document.getElementById('responseTime').innerText = `${latency} ms`;
-            document.getElementById('hudFpsTag').innerText = `${Math.round(1000 / Math.max(latency, 1))} FPS`;
 
-            // Update UI State & Guidance
+            // State sync for navigation & target modes
+            if (data.intent === 'navigation_mode_on' || (data.raw_data && data.raw_data.navigation_mode === true)) {
+                setNavigationMode(true);
+            } else if (data.intent === 'navigation_mode_off' || (data.raw_data && data.raw_data.navigation_mode === false)) {
+                setNavigationMode(false);
+            }
+
             const isHazardAlert = data.raw_data && data.raw_data.path_clear === false;
+            const isTargetMode = data.intent === 'target_guidance' || data.intent === 'target_reached' || data.intent === 'searching_target';
             
             if (isHazardAlert) {
                 intentBadge.innerText = "⚠️ HAZARD DETECTED";
-                intentBadge.classList.add('hazard-badge');
-                guidanceCardBox.classList.add('hazard-active');
+                intentBadge.className = "guidance-badge hazard-badge";
+                guidanceCardBox.className = "guidance-box hazard-active";
+            } else if (isTargetMode) {
+                intentBadge.innerText = data.intent === 'target_reached' ? "🎯 TARGET REACHED" : `🎯 SEEKING: ${data.raw_data.target || activeFindTarget || 'OBJECT'}`;
+                intentBadge.className = "guidance-badge target-badge";
+                guidanceCardBox.className = "guidance-box target-mode-active";
             } else {
-                intentBadge.innerText = data.intent ? data.intent.replace('_', ' ') : 'Response';
-                intentBadge.classList.remove('hazard-badge');
-                guidanceCardBox.classList.remove('hazard-active');
+                intentBadge.innerText = data.intent ? data.intent.replace(/_/g, ' ') : 'Response';
+                intentBadge.className = "guidance-badge";
+                guidanceCardBox.className = "guidance-box";
             }
 
             guidanceTextEl.innerText = data.spoken_response || "Analysis complete.";
             jsonOutput.innerText = JSON.stringify(data, null, 2);
 
-            // Draw bounding boxes on canvas
             const raw = data.raw_data || {};
             const boxes = raw.all_detections || raw.hazards_detected || (raw.bbox ? [raw] : []);
             drawBoundingBoxes(boxes);
             document.getElementById('detectionCount').innerText = `${boxes.length} objects localized`;
 
-            // Speak guidance aloud via TTS
             speak(data.spoken_response);
+
+            setTimeout(() => {
+                isCurrentlyProcessing = false;
+                micBtn.classList.remove('processing');
+            }, 600);
         }
 
         function runPreset(text) {
@@ -1502,28 +1851,8 @@
             executeAssist(text);
         }
 
-        // Auto-Scan Continuous Mode
-        function toggleAutoScan() {
-            isAutoScanning = !isAutoScanning;
-            const btn = document.getElementById('btnAutoScan');
-            if (isAutoScanning) {
-                btn.innerText = "Stop Auto-Scan";
-                btn.classList.add('btn-danger');
-                if (!webcamStream) startCamera(currentFacingMode);
-                autoScanInterval = setInterval(() => {
-                    if (webcamStream) {
-                        executeAssist("Is my path clear?");
-                    }
-                }, 3500);
-            } else {
-                btn.innerText = "Enable Auto-Scan";
-                btn.classList.remove('btn-danger');
-                clearInterval(autoScanInterval);
-            }
-        }
-
         // ==========================================
-        // 8. MODAL & SETTINGS MANAGEMENT
+        // 11. MODALS & AUTO-START
         // ==========================================
         function openBackendModal() {
             document.getElementById('inputBackendUrl').value = API_URL;
@@ -1578,6 +1907,16 @@
         function toggleHighContrast() {
             document.body.classList.toggle('high-contrast');
         }
+
+        // Auto-Start Everything on Page Load & Tap
+        window.addEventListener('DOMContentLoaded', () => {
+            startCamera("environment");
+            startSpeechRecognitionLoop();
+        });
+
+        document.body.addEventListener('click', () => {
+            ensureCameraAndVoice();
+        }, { once: true });
     </script>
 </body>
 </html>

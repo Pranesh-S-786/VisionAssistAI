@@ -116,6 +116,12 @@ def classify_user_intent(text: str) -> str:
     """
     t = text.lower().strip()
 
+    # 0. Navigation Mode voice control
+    if any(k in t for k in ["help me navigate", "start navigation", "navigation mode", "start auto scan", "help me walk", "start walking"]):
+        return "navigation_mode_on"
+    if any(k in t for k in ["get out of navigation", "exit navigation", "stop navigation", "stop navigating", "turn off navigation", "stop auto scan", "stop walking"]):
+        return "navigation_mode_off"
+
     # 1. OCR / Reading intent
     if any(k in t for k in ["read", "text", "medicine", "label", "sign", "document", "what does it say", "ocr"]):
         return "read_text"
@@ -166,7 +172,21 @@ def assist(req: AssistRequest):
     image = decode_base64_image(req.image_base64)
 
     try:
-        if intent_type == "read_text":
+        if intent_type == "navigation_mode_on":
+            return {
+                "intent": "navigation_mode_on",
+                "spoken_response": "Navigation mode activated. Continuously scanning your path every 3 seconds.",
+                "raw_data": {"navigation_mode": True, "interval_ms": 3000}
+            }
+
+        elif intent_type == "navigation_mode_off":
+            return {
+                "intent": "navigation_mode_off",
+                "spoken_response": "Navigation mode deactivated. Auto-scan stopped.",
+                "raw_data": {"navigation_mode": False}
+            }
+
+        elif intent_type == "read_text":
             if image is None:
                 return {
                     "intent": intent_type,
