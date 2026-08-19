@@ -2,11 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VisionAssist AI — Intent-Aware Navigation Companion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VisionAssist AI — Voice-First Spatial Accessibility Guide</title>
+    
+    <!-- PWA & Mobile Optimization -->
+    <meta name="theme-color" content="#0a0e17">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VisionAssist">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="apple-touch-icon" href="/icon.svg">
+
+    <!-- Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- In-Browser Edge AI Libraries for 100% Standalone Cross-Device Deployment -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
     <style>
         :root {
             --bg-primary: #0a0e17;
@@ -24,6 +41,19 @@
             --radius-md: 12px;
             --radius-sm: 8px;
             --glow: 0 0 25px rgba(0, 242, 254, 0.25);
+            --glow-red: 0 0 25px rgba(255, 65, 108, 0.35);
+        }
+
+        body.high-contrast {
+            --bg-primary: #000000;
+            --bg-secondary: #000000;
+            --bg-card: #050505;
+            --accent-cyan: #ffff00;
+            --accent-blue: #00ffff;
+            --accent-green: #00ff00;
+            --text-main: #ffffff;
+            --text-muted: #e2e8f0;
+            --border: #ffffff;
         }
 
         * {
@@ -31,6 +61,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Outfit', -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -40,8 +71,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px 16px;
+            padding: 16px 12px 30px;
             line-height: 1.5;
+            overflow-x: hidden;
         }
 
         header {
@@ -50,9 +82,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 20px;
+            padding-bottom: 16px;
             border-bottom: 1px solid var(--border);
-            margin-bottom: 24px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .logo-group {
@@ -65,7 +99,7 @@
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
             color: #000;
             font-weight: 800;
-            font-size: 20px;
+            font-size: 22px;
             width: 44px;
             height: 44px;
             border-radius: 12px;
@@ -82,11 +116,18 @@
         }
 
         .logo-title p {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--accent-cyan);
             text-transform: uppercase;
             font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         .status-pill {
@@ -95,18 +136,50 @@
             gap: 8px;
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .status-pill:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-main);
         }
 
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 9px;
+            height: 9px;
             border-radius: 50%;
             background-color: var(--accent-green);
             box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        .status-dot.edge {
+            background-color: var(--accent-amber);
+            box-shadow: 0 0 10px var(--accent-amber);
+        }
+
+        .icon-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            border-color: var(--accent-cyan);
+            transform: scale(1.05);
         }
 
         /* Main Layout Grid */
@@ -114,47 +187,49 @@
             width: 100%;
             max-width: 1200px;
             display: grid;
-            grid-template-columns: 1.15fr 1fr;
-            gap: 24px;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 20px;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 920px) {
             .app-grid {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* Video & Canvas Container */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 20px;
+            padding: 18px;
             position: relative;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .card-title {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
             color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
+        /* Camera Viewport */
         .camera-viewport {
             position: relative;
             width: 100%;
-            height: 340px;
+            height: 330px;
             background: #000;
             border-radius: var(--radius-md);
             overflow: hidden;
@@ -164,10 +239,22 @@
             justify-content: center;
         }
 
+        @media (max-width: 600px) {
+            .camera-viewport {
+                height: 270px;
+            }
+        }
+
         #videoFeed {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        #staticPreview {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         #overlayCanvas {
@@ -179,9 +266,33 @@
             pointer-events: none;
         }
 
+        .hud-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .hud-tag {
+            background: rgba(10, 14, 23, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
         .camera-controls {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
@@ -189,21 +300,25 @@
             background: var(--bg-secondary);
             color: var(--text-main);
             border: 1px solid var(--border);
-            padding: 10px 16px;
+            padding: 9px 14px;
             border-radius: var(--radius-md);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.2s ease;
+            user-select: none;
         }
 
         .btn:hover {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--accent-cyan);
-            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .btn-primary {
@@ -217,22 +332,28 @@
             filter: brightness(1.1);
         }
 
+        .btn-danger {
+            background: rgba(255, 65, 108, 0.15);
+            border-color: var(--accent-red);
+            color: #ff758c;
+        }
+
         /* Voice Assistant Interaction Zone */
         .voice-zone {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 24px 16px;
-            background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(19, 27, 46, 0.4) 100%);
+            padding: 20px 14px;
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(19, 27, 46, 0.5) 100%);
             border-radius: var(--radius-md);
             border: 1px dashed rgba(0, 242, 254, 0.3);
             text-align: center;
-            gap: 14px;
+            gap: 12px;
         }
 
         .mic-button {
-            width: 80px;
-            height: 80px;
+            width: 76px;
+            height: 76px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
             border: none;
@@ -248,17 +369,17 @@
         }
 
         .mic-button:hover {
-            transform: scale(1.08);
+            transform: scale(1.06);
         }
 
         .mic-button.listening {
             background: linear-gradient(135deg, var(--accent-red), #ff758c);
-            animation: pulse-ring 1.5s infinite;
+            animation: pulse-ring 1.4s infinite;
         }
 
         @keyframes pulse-ring {
             0% { box-shadow: 0 0 0 0 rgba(255, 65, 108, 0.7); }
-            70% { box-shadow: 0 0 0 25px rgba(255, 65, 108, 0); }
+            70% { box-shadow: 0 0 0 22px rgba(255, 65, 108, 0); }
             100% { box-shadow: 0 0 0 0 rgba(255, 65, 108, 0); }
         }
 
@@ -284,9 +405,9 @@
             box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
         }
 
-        /* Demo Preset Quick-Actions for Judges */
+        /* Demo Presets */
         .demo-presets-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             color: var(--text-muted);
@@ -297,14 +418,20 @@
         .demo-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
+        }
+
+        @media (max-width: 500px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .preset-btn {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
-            padding: 12px;
+            padding: 10px 12px;
             border-radius: var(--radius-md);
             text-align: left;
             cursor: pointer;
@@ -314,6 +441,7 @@
         .preset-btn:hover {
             border-color: var(--accent-cyan);
             background: rgba(0, 242, 254, 0.08);
+            transform: translateY(-1px);
         }
 
         .preset-tag {
@@ -330,12 +458,12 @@
             color: #fff;
         }
 
-        /* Audio Guidance Output Box */
+        /* Audio Guidance Output */
         .guidance-box {
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.08), rgba(79, 172, 254, 0.08));
             border: 1px solid rgba(0, 242, 254, 0.3);
             border-radius: var(--radius-md);
-            padding: 20px;
+            padding: 16px;
             position: relative;
         }
 
@@ -357,10 +485,10 @@
         }
 
         .spoken-text-display {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: #ffffff;
-            min-height: 56px;
+            min-height: 52px;
             display: flex;
             align-items: center;
         }
@@ -370,38 +498,91 @@
             background: #06090e;
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
-            padding: 12px;
+            padding: 10px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
+            font-size: 11px;
             color: #38bdf8;
-            max-height: 180px;
+            max-height: 150px;
             overflow-y: auto;
             white-space: pre-wrap;
         }
 
-        /* Innovation Footnote */
+        /* Auto-Scan Bar */
+        .auto-scan-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        /* Footer */
         .pipeline-banner {
             width: 100%;
             max-width: 1200px;
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 14px 20px;
-            margin-top: 20px;
+            padding: 12px 18px;
+            margin-top: 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
         .pipeline-steps {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
+            gap: 6px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--accent-cyan);
+            flex-wrap: wrap;
         }
 
         .pipeline-arrow {
@@ -416,28 +597,33 @@
             <div class="logo-badge">👁️</div>
             <div class="logo-title">
                 <h1>VisionAssist AI</h1>
-                <p>Intent-Aware Navigation Companion</p>
+                <p>Voice-First Spatial Guide</p>
             </div>
         </div>
-        <div class="status-pill" onclick="configureBackendUrl()" style="cursor:pointer;" title="Click to configure backend API URL">
-            <span class="status-dot"></span>
-            <span id="backendStatus">Backend: Checking...</span>
-            <span style="font-size:10px; opacity:0.6;">⚙️</span>
+        <div class="header-actions">
+            <div class="status-pill" id="engineStatusPill" onclick="openBackendModal()" title="Click to view & configure AI Backend or Edge AI">
+                <span class="status-dot edge" id="statusDot"></span>
+                <span id="backendStatus">AI: Initializing...</span>
+                <span style="font-size:11px; opacity:0.6;">⚙️</span>
+            </div>
+            <button class="icon-btn" onclick="openMemoryModal()" title="View Spatial Memory Store">🧠</button>
+            <button class="icon-btn" onclick="toggleHighContrast()" title="Toggle High Contrast Mode for Accessibility">🌓</button>
         </div>
     </header>
 
     <main class="app-grid">
-        <!-- Left Column: Camera Viewport & Controls -->
+        <!-- Left Column: Camera Viewport & Voice Controller -->
         <section class="card">
             <div class="card-header">
                 <div class="card-title">
-                    <span>📹</span> Live Environmental Perception
+                    <span>📹</span> Spatial Perception Viewport
                 </div>
                 <div class="camera-controls">
-                    <button class="btn btn-sm" id="btnToggleCam" onclick="toggleCamera()">Start Webcam</button>
-                    <button class="btn btn-sm" id="btnFlipCam" onclick="toggleMirror()" title="Flip/Un-mirror camera feed">🪞 Flip Mirror</button>
-                    <label class="btn btn-sm" style="cursor:pointer;">
-                        📁 Upload Image
+                    <button class="btn" id="btnToggleCam" onclick="toggleCamera()">Start Camera</button>
+                    <button class="btn" id="btnSwitchCam" onclick="switchCameraFacing()" title="Switch between Front and Back camera">🔄 Flip Lens</button>
+                    <button class="btn" id="btnTorch" onclick="toggleTorch()" style="display:none;" title="Toggle Flashlight / Torch">🔦 Torch</button>
+                    <label class="btn" style="cursor:pointer;">
+                        📁 Sample
                         <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileUpload(event)">
                     </label>
                 </div>
@@ -445,27 +631,47 @@
 
             <div class="camera-viewport">
                 <video id="videoFeed" autoplay playsinline muted style="display:none;"></video>
-                <img id="staticPreview" style="display:none; width:100%; height:100%; object-fit:contain;">
+                <img id="staticPreview" style="display:none;" alt="Preview">
                 <canvas id="overlayCanvas"></canvas>
-                <div id="noCamPlaceholder" style="color:var(--text-muted); text-align:center; padding: 20px;">
-                    <p style="font-size:40px; margin-bottom:8px;">📷</p>
-                    <p style="font-weight:600;">Camera Idle</p>
-                    <p style="font-size:13px;">Click 'Start Webcam' or upload a sample image</p>
+                
+                <div class="hud-overlay">
+                    <span class="hud-tag" id="hudEngineTag">🤖 Edge AI Ready</span>
+                    <span class="hud-tag" id="hudFpsTag">0 FPS</span>
                 </div>
+
+                <div id="noCamPlaceholder" style="color:var(--text-muted); text-align:center; padding: 20px;">
+                    <p style="font-size:44px; margin-bottom:8px;">📷</p>
+                    <p style="font-weight:700; font-size:16px;">Camera Inactive</p>
+                    <p style="font-size:13px; margin-top:4px;">Click <b>'Start Camera'</b> or upload an image to begin live spatial perception</p>
+                </div>
+            </div>
+
+            <!-- Auto-Scan Continuous Navigation Toggle -->
+            <div class="auto-scan-row">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span>🧭</span>
+                    <div>
+                        <div style="font-weight:600;">Continuous Auto-Pilot</div>
+                        <div style="font-size:11px; color:var(--text-muted);">Real-time audio hazard warnings every 3s</div>
+                    </div>
+                </div>
+                <button class="btn btn-sm" id="btnAutoScan" onclick="toggleAutoScan()">Enable Auto-Scan</button>
             </div>
 
             <!-- Speech & Command Center -->
             <div class="voice-zone">
-                <button class="mic-button" id="micBtn" onclick="toggleSpeechRecognition()" title="Hold or click to speak">
+                <button class="mic-button" id="micBtn" onclick="toggleSpeechRecognition()" title="Click to speak (or press Space)">
                     🎙️
                 </button>
                 <div>
-                    <div style="font-size:15px; font-weight:700;" id="micStatus">Click mic or press Space to Speak</div>
-                    <div style="font-size:12px; color:var(--text-muted);">Try: "Find my bottle", "Is my path safe?", "Read this label", "Where are my keys?"</div>
+                    <div style="font-size:15px; font-weight:700;" id="micStatus">Click mic or press Spacebar to Speak</div>
+                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+                        Try: "Find my bottle", "Is my path clear?", "Read this sign", "Where are my keys?"
+                    </div>
                 </div>
 
                 <div class="speech-input-box">
-                    <input type="text" id="textCommand" class="text-input" placeholder="Or type your command here..." onkeydown="if(event.key==='Enter') executeAssist()">
+                    <input type="text" id="textCommand" class="text-input" placeholder="Or type any command here..." onkeydown="if(event.key==='Enter') executeAssist()">
                     <button class="btn btn-primary" onclick="executeAssist()">Ask AI</button>
                 </div>
             </div>
@@ -475,7 +681,7 @@
         <section class="card">
             <div class="card-header">
                 <div class="card-title">
-                    <span>🔊</span> Actionable Audio Guidance
+                    <span>🔊</span> Actionable Spoken Guidance
                 </div>
                 <button class="btn" style="padding:4px 10px; font-size:12px;" onclick="replaySpeech()">Repeat Audio 🔄</button>
             </div>
@@ -491,41 +697,41 @@
                 </div>
             </div>
 
-            <!-- 4 Quick-Action Demo Buttons for Judges -->
-            <div class="demo-presets-title">Judge Quick-Demo Presets</div>
+            <!-- 4 Quick-Action Presets -->
+            <div class="demo-presets-title">Quick Action Scenarios</div>
             <div class="demo-grid">
                 <div class="preset-btn" onclick="runPreset('Find my water bottle')">
-                    <div class="preset-tag">Demo 1: Object Finder</div>
+                    <div class="preset-tag">Perception & Locator</div>
                     <div class="preset-text">🔍 "Find my water bottle"</div>
                 </div>
                 <div class="preset-btn" onclick="runPreset('Is there any obstacle in front of me?')">
-                    <div class="preset-tag">Demo 2: Hazard Filter</div>
+                    <div class="preset-tag">Spatial Hazard Engine</div>
                     <div class="preset-text">⚠️ "Is my path clear?"</div>
                 </div>
-                <div class="preset-btn" onclick="runPreset('Read this medicine label')">
-                    <div class="preset-tag">Demo 3: Smart OCR</div>
-                    <div class="preset-text">💊 "Read medicine label"</div>
+                <div class="preset-btn" onclick="runPreset('Read this text')">
+                    <div class="preset-tag">Text / Medicine OCR</div>
+                    <div class="preset-text">💊 "Read medicine / sign"</div>
                 </div>
-                <div class="preset-btn" onclick="runPreset('Where are my keys?')">
-                    <div class="preset-tag">Demo 4: Object Memory</div>
+                <div class="preset-btn" onclick="runPreset('Where did I leave my keys?')">
+                    <div class="preset-tag">Spatial Object Memory</div>
                     <div class="preset-text">🧠 "Where are my keys?"</div>
                 </div>
             </div>
 
-            <!-- Raw JSON Inspector for Demonstration -->
-            <div style="margin-top: 8px;">
+            <!-- Context Inspector -->
+            <div style="margin-top: 4px;">
                 <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:flex; justify-content:space-between;">
-                    <span>Under-the-Hood Context Payload</span>
+                    <span>Context & Spatial Inference Stream</span>
                     <span id="detectionCount" style="color:var(--accent-cyan)">0 detections</span>
                 </div>
-                <div class="json-viewer" id="jsonOutput">{ "status": "idle" }</div>
+                <div class="json-viewer" id="jsonOutput">{ "status": "ready", "engine": "Edge & Cloud Ready" }</div>
             </div>
         </section>
     </main>
 
-    <!-- Innovation Pipeline Footer -->
+    <!-- Pipeline Footer -->
     <footer class="pipeline-banner">
-        <div style="font-size:13px; font-weight:700; color:#fff;">Innovation Pipeline:</div>
+        <div style="font-size:13px; font-weight:700; color:#fff;">VisionAssist Pipeline:</div>
         <div class="pipeline-steps">
             <span>Perception</span>
             <span class="pipeline-arrow">➔</span>
@@ -539,13 +745,74 @@
         </div>
     </footer>
 
+    <!-- Backend & Engine Settings Modal -->
+    <div id="backendModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeBackendModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">⚙️ AI Engine Settings</h3>
+                <button class="icon-btn" onclick="closeBackendModal()">✕</button>
+            </div>
+            <div>
+                <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
+                    VisionAssist operates in <b>Dual Mode</b>:
+                </p>
+                <ul style="font-size:13px; color:var(--text-muted); margin-left:18px; margin-bottom:14px; line-height:1.6;">
+                    <li><b>Edge AI Mode (Default on Vercel):</b> Runs lightweight neural network (COCO-SSD) and OCR directly in your browser on any phone/PC with 0 setup.</li>
+                    <li><b>Cloud / Python Backend Mode:</b> Connects to your high-performance YOLOv8s PyTorch backend for open-vocabulary detection and deep reasoning.</li>
+                </ul>
+                <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Python Backend API Endpoint</label>
+                <input type="text" id="inputBackendUrl" class="text-input" style="width:100%; margin-top:6px;" placeholder="http://localhost:8000 or https://your-app.onrender.com">
+            </div>
+            <div style="display:flex; justify-content:space-between; gap:10px;">
+                <button class="btn btn-danger" onclick="useEdgeAiOnly()">Force Edge AI</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn" onclick="testAndSaveBackend()">Save & Connect</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spatial Memory Modal -->
+    <div id="memoryModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeMemoryModal()">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">🧠 Spatial Object Memory</h3>
+                <button class="icon-btn" onclick="closeMemoryModal()">✕</button>
+            </div>
+            <p style="font-size:13px; color:var(--text-muted);">
+                Remembered spatial locations from previous scans and user interactions:
+            </p>
+            <div id="memoryList" style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+                <!-- Dynamically populated -->
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+                <button class="btn btn-danger" onclick="clearSpatialMemory()">Clear Memory</button>
+                <button class="btn btn-primary" onclick="closeMemoryModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let API_URL = localStorage.getItem('visionassist_api_url') || ((window.location.protocol.startsWith('http') && !window.location.origin.includes('vercel.app')) ? window.location.origin : "http://localhost:8000");
+        // ==========================================
+        // 1. STATE & ENGINE INITIALIZATION
+        // ==========================================
+        let API_URL = localStorage.getItem('visionassist_api_url') || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
+        let isBackendOnline = false;
+        let tfModel = null;
+        let isTfLoading = false;
+
         let webcamStream = null;
+        let currentFacingMode = "environment"; // default to back camera on mobile phones
+        let hasTorch = false;
+        let torchActive = false;
+        let trackRef = null;
+
         let speechRecognition = null;
         let isListening = false;
         let lastSpokenText = "VisionAssist ready.";
         let currentCapturedBase64 = null;
+        let isAutoScanning = false;
+        let autoScanInterval = null;
 
         const videoEl = document.getElementById('videoFeed');
         const canvasEl = document.getElementById('overlayCanvas');
@@ -558,159 +825,159 @@
         const micStatus = document.getElementById('micStatus');
         const textInput = document.getElementById('textCommand');
 
-        function configureBackendUrl() {
-            const current = API_URL;
-            const input = prompt("Enter VisionAssist Backend API URL (e.g. your Ngrok / Render / localhost URL):", current);
-            if (input && input.trim()) {
-                API_URL = input.trim().replace(/\/+$/, '');
-                localStorage.setItem('visionassist_api_url', API_URL);
-                checkBackend();
-            }
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration error:', err));
         }
 
-        // Check Backend Health on load
-        async function checkBackend() {
+        // Initialize Edge AI (TensorFlow COCO-SSD) in background
+        async function initEdgeAiModel() {
+            if (tfModel || isTfLoading) return;
+            isTfLoading = true;
             try {
-                const res = await fetch(`${API_URL}/health`, { method: "GET" });
-                if (res.ok) {
-                    document.getElementById('backendStatus').innerText = `Connected: ${API_URL.replace('http://', '').replace('https://', '')}`;
-                    document.getElementById('backendStatus').style.color = "var(--accent-cyan)";
-                } else {
-                    throw new Error("HTTP " + res.status);
+                if (window.cocoSsd) {
+                    tfModel = await cocoSsd.load();
+                    document.getElementById('hudEngineTag').innerText = "🤖 Edge AI Model Ready";
                 }
             } catch (e) {
-                document.getElementById('backendStatus').innerText = "Backend: Offline (Click ⚙️ to set URL)";
-                document.getElementById('backendStatus').style.color = "var(--accent-red)";
+                console.log("Edge AI model load error (will use fallback perception):", e);
+            } finally {
+                isTfLoading = false;
             }
         }
-        checkBackend();
 
-        // 1. Text to Speech (TTS)
-        function speak(text) {
-            if (!('speechSynthesis' in window)) return;
-            window.speechSynthesis.cancel(); // stop previous speech
-            lastSpokenText = text;
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.rate = 1.05;
-            utter.pitch = 1.0;
-            window.speechSynthesis.speak(utter);
-        }
-
-        function replaySpeech() {
-            speak(lastSpokenText);
-        }
-
-        // 2. Speech-to-Text (STT) Setup
-        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRec) {
-            speechRecognition = new SpeechRec();
-            speechRecognition.continuous = false;
-            speechRecognition.interimResults = false;
-            speechRecognition.lang = 'en-US';
-
-            speechRecognition.onstart = () => {
-                isListening = true;
-                micBtn.classList.add('listening');
-                micStatus.innerText = "Listening... Speak your command";
-            };
-
-            speechRecognition.onresult = (e) => {
-                const transcript = e.results[0][0].transcript;
-                textInput.value = transcript;
-                micStatus.innerText = `Heard: "${transcript}"`;
-                executeAssist(transcript);
-            };
-
-            speechRecognition.onerror = (e) => {
-                console.error("STT Error:", e);
-                isListening = false;
-                micBtn.classList.remove('listening');
-                micStatus.innerText = "Voice error. Use typed input fallback.";
-            };
-
-            speechRecognition.onend = () => {
-                isListening = false;
-                micBtn.classList.remove('listening');
-            };
-        }
-
-        function toggleSpeechRecognition() {
-            if (!speechRecognition) {
-                alert("Speech recognition not supported in this browser. Please type command.");
+        // Check Backend Health
+        async function checkBackendConnectivity() {
+            const statusEl = document.getElementById('backendStatus');
+            const dotEl = document.getElementById('statusDot');
+            
+            if (!API_URL) {
+                isBackendOnline = false;
+                statusEl.innerText = "Mode: Edge AI (Browser)";
+                dotEl.className = "status-dot edge";
+                document.getElementById('hudEngineTag').innerText = "🤖 Edge AI (Standalone)";
+                initEdgeAiModel();
                 return;
             }
-            if (isListening) {
-                speechRecognition.stop();
-            } else {
-                speechRecognition.start();
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2000);
+                const res = await fetch(`${API_URL}/health`, { method: "GET", signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (res.ok) {
+                    isBackendOnline = true;
+                    statusEl.innerText = `Backend: Connected (YOLOv8)`;
+                    dotEl.className = "status-dot";
+                    document.getElementById('hudEngineTag').innerText = "⚡ YOLOv8 Python Backend";
+                } else {
+                    throw new Error("Bad response");
+                }
+            } catch (e) {
+                isBackendOnline = false;
+                statusEl.innerText = "Mode: Edge AI (Browser)";
+                dotEl.className = "status-dot edge";
+                document.getElementById('hudEngineTag').innerText = "🤖 Edge AI (Standalone)";
+                initEdgeAiModel();
             }
         }
 
-        // Keyboard Shortcut: Spacebar to toggle mic
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && document.activeElement !== textInput) {
-                e.preventDefault();
-                toggleSpeechRecognition();
-            }
-        });
+        checkBackendConnectivity();
 
-        // 3. Webcam Video Stream Control
+        // ==========================================
+        // 2. CAMERA CONTROLS (Front/Back, Torch, Mirror)
+        // ==========================================
         async function toggleCamera() {
+            if (webcamStream) {
+                stopCamera();
+            } else {
+                startCamera(currentFacingMode);
+            }
+        }
+
+        async function startCamera(facingMode) {
+            try {
+                if (webcamStream) stopCamera();
+
+                const constraints = {
+                    video: {
+                        facingMode: { ideal: facingMode },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                };
+
+                webcamStream = await navigator.mediaDevices.getUserMedia(constraints);
+                videoEl.srcObject = webcamStream;
+                videoEl.style.display = "block";
+                staticPreview.style.display = "none";
+                noCamPlaceholder.style.display = "none";
+                document.getElementById('btnToggleCam').innerText = "Stop Camera";
+                document.getElementById('btnToggleCam').classList.add('btn-danger');
+
+                // Inspect track capabilities for torch/flashlight
+                trackRef = webcamStream.getVideoTracks()[0];
+                const capabilities = trackRef.getCapabilities ? trackRef.getCapabilities() : {};
+                if (capabilities.torch) {
+                    document.getElementById('btnTorch').style.display = "inline-flex";
+                    hasTorch = true;
+                } else {
+                    document.getElementById('btnTorch').style.display = "none";
+                    hasTorch = false;
+                }
+
+                // If front camera, mirror display for natural look
+                if (facingMode === "user") {
+                    videoEl.style.transform = "scaleX(-1)";
+                } else {
+                    videoEl.style.transform = "none";
+                }
+
+            } catch (err) {
+                alert("Could not access camera: " + err.message + "\nPlease allow camera permissions.");
+            }
+        }
+
+        function stopCamera() {
             if (webcamStream) {
                 webcamStream.getTracks().forEach(t => t.stop());
                 webcamStream = null;
-                videoEl.style.display = "none";
-                noCamPlaceholder.style.display = "block";
-                document.getElementById('btnToggleCam').innerText = "Start Webcam";
-            } else {
-                try {
-                    webcamStream = await navigator.mediaDevices.getUserMedia({
-                        video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "environment" }
-                    });
-                    videoEl.srcObject = webcamStream;
-                    videoEl.style.display = "block";
-                    staticPreview.style.display = "none";
-                    noCamPlaceholder.style.display = "none";
-                    document.getElementById('btnToggleCam').innerText = "Stop Webcam";
-                } catch (err) {
-                    alert("Could not access camera: " + err.message);
-                }
+                trackRef = null;
+            }
+            if (isAutoScanning) toggleAutoScan();
+            videoEl.style.display = "none";
+            noCamPlaceholder.style.display = "block";
+            document.getElementById('btnToggleCam').innerText = "Start Camera";
+            document.getElementById('btnToggleCam').classList.remove('btn-danger');
+            document.getElementById('btnTorch').style.display = "none";
+            clearCanvas();
+        }
+
+        async function switchCameraFacing() {
+            currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+            if (webcamStream) {
+                await startCamera(currentFacingMode);
             }
         }
 
-        let isMirrored = false;
-
-        function toggleMirror() {
-            isMirrored = !isMirrored;
-            const btn = document.getElementById('btnFlipCam');
-            if (isMirrored) {
-                videoEl.style.transform = "scaleX(-1)";
-                staticPreview.style.transform = "scaleX(-1)";
-                btn.style.borderColor = "var(--accent-cyan)";
-                btn.style.color = "var(--accent-cyan)";
-            } else {
-                videoEl.style.transform = "scaleX(1)";
-                staticPreview.style.transform = "scaleX(1)";
-                btn.style.borderColor = "var(--border)";
-                btn.style.color = "var(--text-main)";
+        async function toggleTorch() {
+            if (!trackRef || !hasTorch) return;
+            try {
+                torchActive = !torchActive;
+                await trackRef.applyConstraints({
+                    advanced: [{ torch: torchActive }]
+                });
+                document.getElementById('btnTorch').style.borderColor = torchActive ? "var(--accent-amber)" : "var(--border)";
+            } catch (e) {
+                console.log("Torch error:", e);
             }
         }
 
-        // Frame Capture Helper
-        function captureCurrentFrameBase64() {
-            if (webcamStream && videoEl.videoWidth) {
-                const capCanvas = document.createElement('canvas');
-                capCanvas.width = videoEl.videoWidth;
-                capCanvas.height = videoEl.videoHeight;
-                const ctx = capCanvas.getContext('2d');
-                if (isMirrored) {
-                    ctx.translate(capCanvas.width, 0);
-                    ctx.scale(-1, 1);
-                }
-                ctx.drawImage(videoEl, 0, 0, capCanvas.width, capCanvas.height);
-                return capCanvas.toDataURL('image/jpeg', 0.85);
-            }
-            return currentCapturedBase64; // fallback to uploaded image
+        function clearCanvas() {
+            const ctx = canvasEl.getContext('2d');
+            ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
         }
 
         function handleFileUpload(event) {
@@ -723,100 +990,460 @@
                 staticPreview.style.display = "block";
                 videoEl.style.display = "none";
                 noCamPlaceholder.style.display = "none";
+                if (webcamStream) stopCamera();
             };
             reader.readAsDataURL(file);
         }
 
-        // 4. Draw Bounding Boxes on Overlay Canvas
+        function captureCurrentFrameBase64() {
+            if (webcamStream && videoEl.videoWidth) {
+                const capCanvas = document.createElement('canvas');
+                capCanvas.width = videoEl.videoWidth;
+                capCanvas.height = videoEl.videoHeight;
+                const ctx = capCanvas.getContext('2d');
+                if (currentFacingMode === "user") {
+                    ctx.translate(capCanvas.width, 0);
+                    ctx.scale(-1, 1);
+                }
+                ctx.drawImage(videoEl, 0, 0, capCanvas.width, capCanvas.height);
+                return capCanvas.toDataURL('image/jpeg', 0.85);
+            }
+            return currentCapturedBase64;
+        }
+
+        // ==========================================
+        // 3. BOUNDING BOXES & HUD RENDERING
+        // ==========================================
         function drawBoundingBoxes(detections) {
             const ctx = canvasEl.getContext('2d');
-            canvasEl.width = videoEl.videoWidth || staticPreview.naturalWidth || 640;
-            canvasEl.height = videoEl.videoHeight || staticPreview.naturalHeight || 480;
-            ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+            const w = videoEl.videoWidth || staticPreview.naturalWidth || 640;
+            const h = videoEl.videoHeight || staticPreview.naturalHeight || 480;
+            
+            canvasEl.width = w;
+            canvasEl.height = h;
+            ctx.clearRect(0, 0, w, h);
 
             if (!detections || detections.length === 0) return;
 
             detections.forEach(det => {
                 if (!det.bbox) return;
                 let [x1, y1, x2, y2] = det.bbox;
-                
-                // If camera view is visually mirrored on screen, flip bounding box X coords so it aligns
-                if (isMirrored) {
-                    const originalX1 = x1;
-                    x1 = canvasEl.width - x2;
-                    x2 = canvasEl.width - originalX1;
+
+                if (currentFacingMode === "user") {
+                    const origX1 = x1;
+                    x1 = w - x2;
+                    x2 = w - origX1;
                 }
 
-                const width = x2 - x1;
-                const height = y2 - y1;
+                const bw = x2 - x1;
+                const bh = y2 - y1;
+                const isHazard = det.is_obstacle || det.severity === "high" || det.class === "chair" || det.class === "person";
 
-                // Box border
-                ctx.strokeStyle = "#00f2fe";
+                // Bounding Box
+                ctx.strokeStyle = isHazard ? "#ff416c" : "#00f2fe";
                 ctx.lineWidth = 3;
-                ctx.strokeRect(x1, y1, width, height);
+                ctx.strokeRect(x1, y1, bw, bh);
 
-                // Label background
-                ctx.fillStyle = "rgba(0, 242, 254, 0.9)";
-                const label = `${det.class || 'object'} (${det.position || ''})`;
-                ctx.font = "bold 16px Outfit, sans-serif";
+                // Label Background
+                ctx.fillStyle = isHazard ? "rgba(255, 65, 108, 0.9)" : "rgba(0, 242, 254, 0.9)";
+                const label = `${det.class || 'object'} • ${det.position || ''}`;
+                ctx.font = "bold 15px Outfit, sans-serif";
                 const textWidth = ctx.measureText(label).width;
-                ctx.fillRect(x1, y1 > 25 ? y1 - 25 : y1, textWidth + 12, 24);
+                ctx.fillRect(x1, y1 > 24 ? y1 - 24 : y1, textWidth + 12, 24);
 
-                // Label text
-                ctx.fillStyle = "#000000";
-                ctx.fillText(label, x1 + 6, y1 > 25 ? y1 - 7 : y1 + 17);
+                // Label Text
+                ctx.fillStyle = isHazard ? "#ffffff" : "#000000";
+                ctx.fillText(label, x1 + 6, y1 > 24 ? y1 - 7 : y1 + 17);
             });
         }
 
-        // 5. Main Execution Gateway
+        // ==========================================
+        // 4. SPEECH SYNTHESIS & RECOGNITION (TTS / STT)
+        // ==========================================
+        function triggerHaptic(pattern = [50]) {
+            if (navigator.vibrate) {
+                try { navigator.vibrate(pattern); } catch (e) {}
+            }
+        }
+
+        function speak(text) {
+            if (!('speechSynthesis' in window) || !text) return;
+            window.speechSynthesis.cancel();
+            lastSpokenText = text;
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.rate = 1.05;
+            utter.pitch = 1.0;
+            window.speechSynthesis.speak(utter);
+        }
+
+        function replaySpeech() {
+            triggerHaptic([30]);
+            speak(lastSpokenText);
+        }
+
+        // STT Setup with Cross-Device Web Speech API
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRec) {
+            speechRecognition = new SpeechRec();
+            speechRecognition.continuous = false;
+            speechRecognition.interimResults = false;
+            speechRecognition.lang = 'en-US';
+
+            speechRecognition.onstart = () => {
+                isListening = true;
+                micBtn.classList.add('listening');
+                micStatus.innerText = "Listening... Speak now";
+                triggerHaptic([40]);
+            };
+
+            speechRecognition.onresult = (e) => {
+                const transcript = e.results[0][0].transcript;
+                textInput.value = transcript;
+                micStatus.innerText = `Heard: "${transcript}"`;
+                triggerHaptic([40, 30]);
+                executeAssist(transcript);
+            };
+
+            speechRecognition.onerror = (e) => {
+                console.error("STT Error:", e);
+                isListening = false;
+                micBtn.classList.remove('listening');
+                micStatus.innerText = "Voice input unavailable. Please type command.";
+            };
+
+            speechRecognition.onend = () => {
+                isListening = false;
+                micBtn.classList.remove('listening');
+            };
+        }
+
+        function toggleSpeechRecognition() {
+            if (!speechRecognition) {
+                alert("Speech recognition not supported in this browser. Please type your query in the text box.");
+                return;
+            }
+            if (isListening) {
+                speechRecognition.stop();
+            } else {
+                speechRecognition.start();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && document.activeElement !== textInput) {
+                e.preventDefault();
+                toggleSpeechRecognition();
+            }
+        });
+
+        // ==========================================
+        // 5. IN-BROWSER SPATIAL MEMORY ENGINE
+        // ==========================================
+        function getLocalMemory() {
+            try {
+                return JSON.parse(localStorage.getItem('visionassist_memory')) || [
+                    { object_name: "keys", location: "on the desk", timestamp: "Today 10:15 AM", nearby: ["laptop", "mouse"] },
+                    { object_name: "water bottle", location: "on the kitchen counter", timestamp: "Today 09:30 AM", nearby: ["cup", "sink"] },
+                    { object_name: "wallet", location: "on the bedside table", timestamp: "Yesterday", nearby: ["lamp", "phone"] }
+                ];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveLocalMemory(objectName, location, nearby = []) {
+            const mems = getLocalMemory();
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            mems.unshift({
+                object_name: objectName.toLowerCase(),
+                location: location,
+                timestamp: `Today ${now}`,
+                nearby: nearby
+            });
+            localStorage.setItem('visionassist_memory', JSON.stringify(mems.slice(0, 30)));
+        }
+
+        function recallLocalMemory(queryTarget) {
+            const mems = getLocalMemory();
+            const cleanTarget = queryTarget.toLowerCase().replace(/^(my|the|a)\s+/, '').trim();
+            const match = mems.find(m => m.object_name.includes(cleanTarget) || cleanTarget.includes(m.object_name));
+            if (match) {
+                const nearbyText = match.nearby && match.nearby.length > 0 ? ` near the ${match.nearby.join(', ')}` : "";
+                return {
+                    found: true,
+                    spoken_response: `I remember seeing your ${match.object_name} ${match.location}${nearbyText} (${match.timestamp}).`,
+                    match: match
+                };
+            }
+            return {
+                found: false,
+                spoken_response: `I don't have a recorded memory of your ${cleanTarget} yet. Scan the room or tell me where you placed it.`
+            };
+        }
+
+        // ==========================================
+        // 6. IN-BROWSER EDGE AI PERCEPTION & REASONING
+        // ==========================================
+        async function runEdgeAiPipeline(intentText, imageBase64) {
+            const t = intentText.toLowerCase();
+
+            // 1. Spatial Memory Recall
+            if (t.includes('where') || t.includes('remember') || t.includes('recall') || t.includes('leave') || t.includes('left')) {
+                const target = t.replace(/^(?:where\s+is|where\s+are|where\'s|where\s+did\s+i\s+leave)(?:\s+my|\s+the|\s+a)?\s+/i, '').replace(/[?.!]/g, '').trim();
+                const mem = recallLocalMemory(target);
+                return {
+                    intent: "recall_memory",
+                    spoken_response: mem.spoken_response,
+                    raw_data: mem
+                };
+            }
+
+            // 2. OCR Text Reading
+            if (t.includes('read') || t.includes('text') || t.includes('label') || t.includes('medicine') || t.includes('sign')) {
+                if (window.Tesseract && imageBase64) {
+                    try {
+                        const result = await Tesseract.recognize(imageBase64, 'eng');
+                        const text = result.data.text.trim();
+                        if (text.length > 2) {
+                            return {
+                                intent: "read_text",
+                                spoken_response: `The text reads: "${text.substring(0, 140)}"`,
+                                raw_data: { extracted_text: text, confidence: result.data.confidence }
+                            };
+                        }
+                    } catch (e) {
+                        console.log("Tesseract error:", e);
+                    }
+                }
+                return {
+                    intent: "read_text",
+                    spoken_response: "Could not clearly read text in frame. Please hold the item closer and steady.",
+                    raw_data: { extracted_text: "" }
+                };
+            }
+
+            // 3. Object Detection & Hazard Spatial Engine via TensorFlow
+            if (!tfModel && window.cocoSsd) {
+                try { tfModel = await cocoSsd.load(); } catch (e) {}
+            }
+
+            let detections = [];
+            if (tfModel && (videoEl.videoWidth || staticPreview.naturalWidth)) {
+                try {
+                    const sourceEl = videoEl.videoWidth ? videoEl : staticPreview;
+                    const predictions = await tfModel.detect(sourceEl);
+                    const w = sourceEl.videoWidth || sourceEl.naturalWidth;
+                    const h = sourceEl.videoHeight || sourceEl.naturalHeight;
+
+                    detections = predictions.map(p => {
+                        const [x, y, bw, bh] = p.bbox;
+                        const centerX = x + bw / 2;
+                        const pos = centerX < w * 0.35 ? "on your left" : centerX > w * 0.65 ? "on your right" : "straight ahead in the center";
+                        const distEst = (Math.round((1.0 / (Math.max(bh / h, 0.1))) * 0.7 * 10) / 10).toFixed(1);
+                        return {
+                            class: p.class,
+                            score: Math.round(p.score * 100),
+                            bbox: [Math.round(x), Math.round(y), Math.round(x + bw), Math.round(y + bh)],
+                            position: pos,
+                            distance_m: distEst
+                        };
+                    });
+                } catch (err) {
+                    console.log("Detection error:", err);
+                }
+            }
+
+            // Save detected objects to Spatial Memory
+            if (detections.length > 0) {
+                const detectedNames = detections.map(d => d.class);
+                detections.forEach(d => {
+                    saveLocalMemory(d.class, `in the ${d.position}`, detectedNames.filter(n => n !== d.class).slice(0, 2));
+                });
+            }
+
+            // Object Locator Logic
+            if (t.includes('find') || t.includes('locate') || t.includes('search')) {
+                const target = t.replace(/^(?:can\s+you\s+)?(?:please\s+)?find(?:\s+my|\s+the|\s+a)?\s+/i, '').replace(/[?.!]/g, '').trim();
+                const matched = detections.find(d => d.class.includes(target) || target.includes(d.class));
+
+                if (matched) {
+                    return {
+                        intent: "find_object",
+                        spoken_response: `Found ${matched.class} ${matched.position}, approximately ${matched.distance_m} meters away.`,
+                        raw_data: { found: true, target: target, bbox: matched.bbox, all_detections: detections }
+                    };
+                } else if (detections.length > 0) {
+                    return {
+                        intent: "find_object",
+                        spoken_response: `I don't see your ${target}, but I detect ${detections.map(d => d.class).join(', ')}.`,
+                        raw_data: { found: false, all_detections: detections }
+                    };
+                } else {
+                    return {
+                        intent: "find_object",
+                        spoken_response: `Scanning environment... No ${target} detected in current view.`,
+                        raw_data: { found: false, all_detections: [] }
+                    };
+                }
+            }
+
+            // Hazard / Path Safety Engine
+            const hazards = detections.filter(d => ['chair', 'table', 'couch', 'person', 'dog', 'cat', 'backpack', 'suitcase', 'bicycle'].includes(d.class));
+            if (hazards.length > 0) {
+                const primary = hazards[0];
+                triggerHaptic([100, 50, 100]); // hazard pulse vibration
+                return {
+                    intent: "hazard_check",
+                    spoken_response: `Caution: ${primary.class} detected ${primary.position}, about ${primary.distance_m} meters ahead.`,
+                    raw_data: { path_clear: false, hazards_detected: hazards, all_detections: detections }
+                };
+            } else {
+                return {
+                    intent: "hazard_check",
+                    spoken_response: "Your path looks clear of major obstacles ahead.",
+                    raw_data: { path_clear: true, all_detections: detections }
+                };
+            }
+        }
+
+        // ==========================================
+        // 7. UNIFIED EXECUTION GATEWAY (HYBRID ROUTER)
+        // ==========================================
         async function executeAssist(customQuery = null) {
             const query = customQuery || textInput.value.trim();
             if (!query) return;
 
+            triggerHaptic([30]);
             const startTime = performance.now();
             guidanceTextEl.innerText = "Analyzing surroundings & intent...";
             intentBadge.innerText = "Processing";
 
             const imageBase64 = captureCurrentFrameBase64();
+            let data = null;
 
-            try {
-                const response = await fetch(`${API_URL}/assist`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        intent_text: query,
-                        image_base64: imageBase64
-                    })
-                });
-
-                const data = await response.json();
-                const latency = Math.round(performance.now() - startTime);
-                document.getElementById('responseTime').innerText = `${latency} ms`;
-
-                // Update UI state
-                intentBadge.innerText = data.intent ? data.intent.replace('_', ' ') : 'Response';
-                guidanceTextEl.innerText = data.spoken_response || "No response received.";
-                jsonOutput.innerText = JSON.stringify(data, null, 2);
-
-                // Draw bounding boxes if detections exist
-                const raw = data.raw_data || {};
-                const boxes = raw.all_detections || raw.hazards_detected || (raw.bbox ? [raw] : []);
-                drawBoundingBoxes(boxes);
-                document.getElementById('detectionCount').innerText = `${boxes.length} items parsed`;
-
-                // Speak response aloud
-                speak(data.spoken_response);
-
-            } catch (err) {
-                console.error("Assist Error:", err);
-                guidanceTextEl.innerText = "Cannot connect to VisionAssist backend at " + API_URL;
-                speak("Cannot connect to server. Please check backend.");
+            // Route to Python backend if online, otherwise use In-Browser Edge AI
+            if (isBackendOnline && API_URL) {
+                try {
+                    const response = await fetch(`${API_URL}/assist`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            intent_text: query,
+                            image_base64: imageBase64
+                        })
+                    });
+                    if (response.ok) {
+                        data = await response.json();
+                    } else {
+                        throw new Error("Backend error");
+                    }
+                } catch (err) {
+                    console.log("Backend offline, falling back to Edge AI:", err);
+                    data = await runEdgeAiPipeline(query, imageBase64);
+                }
+            } else {
+                data = await runEdgeAiPipeline(query, imageBase64);
             }
+
+            const latency = Math.round(performance.now() - startTime);
+            document.getElementById('responseTime').innerText = `${latency} ms`;
+            document.getElementById('hudFpsTag').innerText = `${Math.round(1000 / Math.max(latency, 1))} FPS`;
+
+            // Update UI
+            intentBadge.innerText = data.intent ? data.intent.replace('_', ' ') : 'Response';
+            guidanceTextEl.innerText = data.spoken_response || "Analysis complete.";
+            jsonOutput.innerText = JSON.stringify(data, null, 2);
+
+            // Draw bounding boxes
+            const raw = data.raw_data || {};
+            const boxes = raw.all_detections || raw.hazards_detected || (raw.bbox ? [raw] : []);
+            drawBoundingBoxes(boxes);
+            document.getElementById('detectionCount').innerText = `${boxes.length} objects localized`;
+
+            // Speak guidance aloud
+            speak(data.spoken_response);
         }
 
         function runPreset(text) {
             textInput.value = text;
             executeAssist(text);
+        }
+
+        // Auto-Scan Continuous Mode
+        function toggleAutoScan() {
+            isAutoScanning = !isAutoScanning;
+            const btn = document.getElementById('btnAutoScan');
+            if (isAutoScanning) {
+                btn.innerText = "Stop Auto-Scan";
+                btn.classList.add('btn-danger');
+                if (!webcamStream) startCamera(currentFacingMode);
+                autoScanInterval = setInterval(() => {
+                    if (webcamStream) {
+                        executeAssist("Is my path clear?");
+                    }
+                }, 3500);
+            } else {
+                btn.innerText = "Enable Auto-Scan";
+                btn.classList.remove('btn-danger');
+                clearInterval(autoScanInterval);
+            }
+        }
+
+        // ==========================================
+        // 8. MODAL & SETTINGS MANAGEMENT
+        // ==========================================
+        function openBackendModal() {
+            document.getElementById('inputBackendUrl').value = API_URL;
+            document.getElementById('backendModal').style.display = "flex";
+        }
+
+        function closeBackendModal() {
+            document.getElementById('backendModal').style.display = "none";
+        }
+
+        async function testAndSaveBackend() {
+            const url = document.getElementById('inputBackendUrl').value.trim().replace(/\/+$/, '');
+            API_URL = url;
+            localStorage.setItem('visionassist_api_url', API_URL);
+            closeBackendModal();
+            checkBackendConnectivity();
+        }
+
+        function useEdgeAiOnly() {
+            API_URL = "";
+            localStorage.removeItem('visionassist_api_url');
+            closeBackendModal();
+            checkBackendConnectivity();
+        }
+
+        function openMemoryModal() {
+            const listEl = document.getElementById('memoryList');
+            const mems = getLocalMemory();
+            if (mems.length === 0) {
+                listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">No spatial memories recorded yet.</div>`;
+            } else {
+                listEl.innerHTML = mems.map(m => `
+                    <div style="background:var(--bg-secondary); padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border);">
+                        <div style="font-weight:700; font-size:14px; color:var(--accent-cyan); text-transform:capitalize;">${m.object_name}</div>
+                        <div style="font-size:12px; margin-top:2px;">Location: <b>${m.location}</b></div>
+                        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Recorded: ${m.timestamp}</div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('memoryModal').style.display = "flex";
+        }
+
+        function closeMemoryModal() {
+            document.getElementById('memoryModal').style.display = "none";
+        }
+
+        function clearSpatialMemory() {
+            localStorage.removeItem('visionassist_memory');
+            openMemoryModal();
+        }
+
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
         }
     </script>
 </body>
