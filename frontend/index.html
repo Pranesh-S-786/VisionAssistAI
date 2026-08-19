@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <!-- In-Browser Edge AI Libraries for 100% Standalone Cross-Device Deployment -->
+    <!-- In-Browser Edge AI Neural Network & OCR Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -32,7 +32,7 @@
             --accent-cyan: #00f2fe;
             --accent-blue: #4facfe;
             --accent-amber: #f6d365;
-            --accent-red: #ff416c;
+            --accent-red: #ff3366;
             --accent-green: #00b09b;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -41,7 +41,7 @@
             --radius-md: 12px;
             --radius-sm: 8px;
             --glow: 0 0 25px rgba(0, 242, 254, 0.25);
-            --glow-red: 0 0 25px rgba(255, 65, 108, 0.35);
+            --glow-red: 0 0 25px rgba(255, 51, 102, 0.4);
         }
 
         body.high-contrast {
@@ -51,6 +51,7 @@
             --accent-cyan: #ffff00;
             --accent-blue: #00ffff;
             --accent-green: #00ff00;
+            --accent-red: #ff0055;
             --text-main: #ffffff;
             --text-muted: #e2e8f0;
             --border: #ffffff;
@@ -229,7 +230,7 @@
         .camera-viewport {
             position: relative;
             width: 100%;
-            height: 330px;
+            height: 340px;
             background: #000;
             border-radius: var(--radius-md);
             overflow: hidden;
@@ -241,7 +242,7 @@
 
         @media (max-width: 600px) {
             .camera-viewport {
-                height: 270px;
+                height: 290px;
             }
         }
 
@@ -333,7 +334,7 @@
         }
 
         .btn-danger {
-            background: rgba(255, 65, 108, 0.15);
+            background: rgba(255, 51, 102, 0.18);
             border-color: var(--accent-red);
             color: #ff758c;
         }
@@ -378,9 +379,9 @@
         }
 
         @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(255, 65, 108, 0.7); }
-            70% { box-shadow: 0 0 0 22px rgba(255, 65, 108, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 65, 108, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0.7); }
+            70% { box-shadow: 0 0 0 22px rgba(255, 51, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 51, 102, 0); }
         }
 
         .speech-input-box {
@@ -465,6 +466,13 @@
             border-radius: var(--radius-md);
             padding: 16px;
             position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .guidance-box.hazard-active {
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.15), rgba(255, 117, 140, 0.1));
+            border-color: var(--accent-red);
+            box-shadow: var(--glow-red);
         }
 
         .guidance-header {
@@ -482,6 +490,12 @@
             padding: 2px 8px;
             border-radius: 6px;
             text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .guidance-badge.hazard-badge {
+            background: var(--accent-red);
+            color: #ffffff;
         }
 
         .spoken-text-display {
@@ -666,7 +680,7 @@
                 <div>
                     <div style="font-size:15px; font-weight:700;" id="micStatus">Click mic or press Spacebar to Speak</div>
                     <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
-                        Try: "Find my bottle", "Is my path clear?", "Read this sign", "Where are my keys?"
+                        Try: "Is my path clear?", "Find my water bottle", "Read this text", "Where are my keys?"
                     </div>
                 </div>
 
@@ -687,7 +701,7 @@
             </div>
 
             <!-- Primary Guidance Card -->
-            <div class="guidance-box">
+            <div class="guidance-box" id="guidanceCardBox">
                 <div class="guidance-header">
                     <span class="guidance-badge" id="intentBadge">Awaiting Command</span>
                     <span style="font-size:12px; color:var(--text-muted);" id="responseTime">0 ms</span>
@@ -700,13 +714,13 @@
             <!-- 4 Quick-Action Presets -->
             <div class="demo-presets-title">Quick Action Scenarios</div>
             <div class="demo-grid">
-                <div class="preset-btn" onclick="runPreset('Find my water bottle')">
-                    <div class="preset-tag">Perception & Locator</div>
-                    <div class="preset-text">🔍 "Find my water bottle"</div>
-                </div>
                 <div class="preset-btn" onclick="runPreset('Is there any obstacle in front of me?')">
                     <div class="preset-tag">Spatial Hazard Engine</div>
                     <div class="preset-text">⚠️ "Is my path clear?"</div>
+                </div>
+                <div class="preset-btn" onclick="runPreset('Find my water bottle')">
+                    <div class="preset-tag">Perception & Locator</div>
+                    <div class="preset-text">🔍 "Find my bottle / chair"</div>
                 </div>
                 <div class="preset-btn" onclick="runPreset('Read this text')">
                     <div class="preset-tag">Text / Medicine OCR</div>
@@ -757,8 +771,8 @@
                     VisionAssist operates in <b>Dual Mode</b>:
                 </p>
                 <ul style="font-size:13px; color:var(--text-muted); margin-left:18px; margin-bottom:14px; line-height:1.6;">
-                    <li><b>Edge AI Mode (Default on Vercel):</b> Runs lightweight neural network (COCO-SSD) and OCR directly in your browser on any phone/PC with 0 setup.</li>
-                    <li><b>Cloud / Python Backend Mode:</b> Connects to your high-performance YOLOv8s PyTorch backend for open-vocabulary detection and deep reasoning.</li>
+                    <li><b>Edge AI Mode (Standalone):</b> Runs neural network (COCO-SSD) and OCR directly in your browser on any phone/PC with 0 setup.</li>
+                    <li><b>Cloud / Python Backend Mode:</b> Connects to your YOLOv8s PyTorch backend for open-vocabulary detection and deep reasoning.</li>
                 </ul>
                 <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Python Backend API Endpoint</label>
                 <input type="text" id="inputBackendUrl" class="text-input" style="width:100%; margin-top:6px;" placeholder="http://localhost:8000 or https://your-app.onrender.com">
@@ -802,7 +816,7 @@
         let isTfLoading = false;
 
         let webcamStream = null;
-        let currentFacingMode = "environment"; // default to back camera on mobile phones
+        let currentFacingMode = "environment"; // default to back camera on phones
         let hasTorch = false;
         let torchActive = false;
         let trackRef = null;
@@ -820,10 +834,21 @@
         const noCamPlaceholder = document.getElementById('noCamPlaceholder');
         const guidanceTextEl = document.getElementById('guidanceText');
         const intentBadge = document.getElementById('intentBadge');
+        const guidanceCardBox = document.getElementById('guidanceCardBox');
         const jsonOutput = document.getElementById('jsonOutput');
         const micBtn = document.getElementById('micBtn');
         const micStatus = document.getElementById('micStatus');
         const textInput = document.getElementById('textCommand');
+
+        // Comprehensive Obstacle Catalog (covers indoor/outdoor furniture, obstacles, hazards, trip hazards)
+        const OBSTACLE_CLASSES = new Set([
+            'bench', 'chair', 'dining table', 'table', 'couch', 'sofa', 'bed', 'stool', 'desk',
+            'toilet', 'potted plant', 'pottedplant', 'suitcase', 'backpack', 'handbag', 'box',
+            'tv', 'refrigerator', 'microwave', 'oven', 'sink', 'person', 'dog', 'cat',
+            'bicycle', 'motorcycle', 'car', 'truck', 'bus', 'fire hydrant', 'stop sign',
+            'traffic light', 'parking meter', 'trash', 'bin', 'door', 'umbrella', 'skateboard',
+            'sports ball', 'stairs', 'bottle', 'cup', 'bowl', 'laptop'
+        ]);
 
         // Service Worker Registration for PWA
         if ('serviceWorker' in navigator) {
@@ -840,7 +865,7 @@
                     document.getElementById('hudEngineTag').innerText = "🤖 Edge AI Model Ready";
                 }
             } catch (e) {
-                console.log("Edge AI model load error (will use fallback perception):", e);
+                console.log("Edge AI model load error:", e);
             } finally {
                 isTfLoading = false;
             }
@@ -886,7 +911,7 @@
         checkBackendConnectivity();
 
         // ==========================================
-        // 2. CAMERA CONTROLS (Front/Back, Torch, Mirror)
+        // 2. CAMERA CONTROLS
         // ==========================================
         async function toggleCamera() {
             if (webcamStream) {
@@ -917,7 +942,6 @@
                 document.getElementById('btnToggleCam').innerText = "Stop Camera";
                 document.getElementById('btnToggleCam').classList.add('btn-danger');
 
-                // Inspect track capabilities for torch/flashlight
                 trackRef = webcamStream.getVideoTracks()[0];
                 const capabilities = trackRef.getCapabilities ? trackRef.getCapabilities() : {};
                 if (capabilities.torch) {
@@ -928,7 +952,6 @@
                     hasTorch = false;
                 }
 
-                // If front camera, mirror display for natural look
                 if (facingMode === "user") {
                     videoEl.style.transform = "scaleX(-1)";
                 } else {
@@ -936,7 +959,7 @@
                 }
 
             } catch (err) {
-                alert("Could not access camera: " + err.message + "\nPlease allow camera permissions.");
+                alert("Could not access camera: " + err.message + "\nPlease grant camera permission.");
             }
         }
 
@@ -1037,23 +1060,23 @@
 
                 const bw = x2 - x1;
                 const bh = y2 - y1;
-                const isHazard = det.is_obstacle || det.severity === "high" || det.class === "chair" || det.class === "person";
+                const isHazard = det.is_obstacle === true || det.is_hazard === true;
 
                 // Bounding Box
-                ctx.strokeStyle = isHazard ? "#ff416c" : "#00f2fe";
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = isHazard ? "#ff3366" : "#00f2fe";
+                ctx.lineWidth = isHazard ? 4 : 3;
                 ctx.strokeRect(x1, y1, bw, bh);
 
                 // Label Background
-                ctx.fillStyle = isHazard ? "rgba(255, 65, 108, 0.9)" : "rgba(0, 242, 254, 0.9)";
-                const label = `${det.class || 'object'} • ${det.position || ''}`;
+                ctx.fillStyle = isHazard ? "rgba(255, 51, 102, 0.95)" : "rgba(0, 242, 254, 0.9)";
+                const label = `${isHazard ? '⚠️ ' : ''}${det.class || 'object'} (${det.position || ''}, ~${det.distance_m || '?'}m)`;
                 ctx.font = "bold 15px Outfit, sans-serif";
                 const textWidth = ctx.measureText(label).width;
-                ctx.fillRect(x1, y1 > 24 ? y1 - 24 : y1, textWidth + 12, 24);
+                ctx.fillRect(x1, y1 > 26 ? y1 - 26 : y1, textWidth + 14, 26);
 
                 // Label Text
-                ctx.fillStyle = isHazard ? "#ffffff" : "#000000";
-                ctx.fillText(label, x1 + 6, y1 > 24 ? y1 - 7 : y1 + 17);
+                ctx.fillStyle = "#ffffff";
+                ctx.fillText(label, x1 + 6, y1 > 26 ? y1 - 8 : y1 + 18);
             });
         }
 
@@ -1108,7 +1131,7 @@
                 console.error("STT Error:", e);
                 isListening = false;
                 micBtn.classList.remove('listening');
-                micStatus.innerText = "Voice input unavailable. Please type command.";
+                micStatus.innerText = "Voice input error. Please type command.";
             };
 
             speechRecognition.onend = () => {
@@ -1143,8 +1166,7 @@
             try {
                 return JSON.parse(localStorage.getItem('visionassist_memory')) || [
                     { object_name: "keys", location: "on the desk", timestamp: "Today 10:15 AM", nearby: ["laptop", "mouse"] },
-                    { object_name: "water bottle", location: "on the kitchen counter", timestamp: "Today 09:30 AM", nearby: ["cup", "sink"] },
-                    { object_name: "wallet", location: "on the bedside table", timestamp: "Yesterday", nearby: ["lamp", "phone"] }
+                    { object_name: "water bottle", location: "on the table", timestamp: "Today 09:30 AM", nearby: ["cup"] }
                 ];
             } catch (e) {
                 return [];
@@ -1182,7 +1204,7 @@
         }
 
         // ==========================================
-        // 6. IN-BROWSER EDGE AI PERCEPTION & REASONING
+        // 6. IN-BROWSER EDGE AI PERCEPTION & REASONING ENGINE
         // ==========================================
         async function runEdgeAiPipeline(intentText, imageBase64) {
             const t = intentText.toLowerCase();
@@ -1222,30 +1244,57 @@
                 };
             }
 
-            // 3. Object Detection & Hazard Spatial Engine via TensorFlow
+            // 3. Object Detection & Spatial Perception via TensorFlow.js COCO-SSD
             if (!tfModel && window.cocoSsd) {
                 try { tfModel = await cocoSsd.load(); } catch (e) {}
             }
 
             let detections = [];
-            if (tfModel && (videoEl.videoWidth || staticPreview.naturalWidth)) {
+            const sourceEl = (webcamStream && videoEl.videoWidth) ? videoEl : (staticPreview.style.display !== 'none' ? staticPreview : null);
+
+            if (tfModel && sourceEl) {
                 try {
-                    const sourceEl = videoEl.videoWidth ? videoEl : staticPreview;
                     const predictions = await tfModel.detect(sourceEl);
-                    const w = sourceEl.videoWidth || sourceEl.naturalWidth;
-                    const h = sourceEl.videoHeight || sourceEl.naturalHeight;
+                    const w = sourceEl.videoWidth || sourceEl.naturalWidth || 640;
+                    const h = sourceEl.videoHeight || sourceEl.naturalHeight || 480;
 
                     detections = predictions.map(p => {
                         const [x, y, bw, bh] = p.bbox;
                         const centerX = x + bw / 2;
-                        const pos = centerX < w * 0.35 ? "on your left" : centerX > w * 0.65 ? "on your right" : "straight ahead in the center";
-                        const distEst = (Math.round((1.0 / (Math.max(bh / h, 0.1))) * 0.7 * 10) / 10).toFixed(1);
+                        const centerY = y + bh / 2;
+                        const areaRatio = (bw * bh) / (w * h);
+
+                        // Horizontal Sector
+                        let pos = "in front of you";
+                        if (centerX < w * 0.35) {
+                            pos = "on your left";
+                        } else if (centerX > w * 0.65) {
+                            pos = "on your right";
+                        } else {
+                            pos = "straight ahead in your path";
+                        }
+
+                        // Robust Distance Estimation based on bounding box size & height
+                        const distEst = (Math.round((1.0 / (Math.max(bh / h, 0.12))) * 0.6 * 10) / 10).toFixed(1);
+
+                        // Robust Obstacle Determination
+                        const isKnownObstacleClass = OBSTACLE_CLASSES.has(p.class.toLowerCase());
+                        const isLargeInFrame = areaRatio > 0.06;
+                        const isInWalkingCorridor = (centerX >= w * 0.2 && centerX <= w * 0.8) && (y + bh >= h * 0.35);
+                        const isCloseProximity = parseFloat(distEst) <= 2.8;
+
+                        const isObstacle = (isKnownObstacleClass || isLargeInFrame) && (isInWalkingCorridor || isCloseProximity);
+
                         return {
                             class: p.class,
                             score: Math.round(p.score * 100),
                             bbox: [Math.round(x), Math.round(y), Math.round(x + bw), Math.round(y + bh)],
                             position: pos,
-                            distance_m: distEst
+                            centerX: centerX,
+                            centerY: centerY,
+                            areaRatio: areaRatio,
+                            distance_m: distEst,
+                            is_obstacle: isObstacle
                         };
                     });
                 } catch (err) {
@@ -1257,51 +1306,122 @@
             if (detections.length > 0) {
                 const detectedNames = detections.map(d => d.class);
                 detections.forEach(d => {
-                    saveLocalMemory(d.class, `in the ${d.position}`, detectedNames.filter(n => n !== d.class).slice(0, 2));
+                    saveLocalMemory(d.class, `located ${d.position}`, detectedNames.filter(n => n !== d.class).slice(0, 2));
                 });
             }
 
-            // Object Locator Logic
-            if (t.includes('find') || t.includes('locate') || t.includes('search')) {
-                const target = t.replace(/^(?:can\s+you\s+)?(?:please\s+)?find(?:\s+my|\s+the|\s+a)?\s+/i, '').replace(/[?.!]/g, '').trim();
-                const matched = detections.find(d => d.class.includes(target) || target.includes(d.class));
+            // ====================================================
+            // 4. SMART HAZARD REASONING ENGINE (Obstacle Checking)
+            // ====================================================
+            const isHazardIntent = t.includes('hazard') || t.includes('obstacle') || t.includes('safe') || 
+                                   t.includes('path') || t.includes('clear') || t.includes('walk') || 
+                                   t.includes('ahead') || t.includes('front') || t.includes('navigate');
 
-                if (matched) {
+            if (isHazardIntent) {
+                // Filter all active obstacles
+                const hazards = detections.filter(d => d.is_obstacle);
+
+                if (hazards.length > 0) {
+                    // Sort by closest distance
+                    hazards.sort((a, b) => parseFloat(a.distance_m) - parseFloat(b.distance_m));
+                    const primary = hazards[0];
+
+                    // Spatial Evading Calculation
+                    const w = sourceEl ? (sourceEl.videoWidth || sourceEl.naturalWidth || 640) : 640;
+                    const centerObstacles = hazards.filter(h => h.centerX >= w * 0.3 && h.centerX <= w * 0.7);
+                    const leftObstacles = hazards.filter(h => h.centerX < w * 0.4);
+                    const rightObstacles = hazards.filter(h => h.centerX > w * 0.6);
+
+                    let evasionAdvice = "";
+                    if (centerObstacles.length > 0) {
+                        if (leftObstacles.length === 0) {
+                            evasionAdvice = " Please step or steer to your left.";
+                        } else if (rightObstacles.length === 0) {
+                            evasionAdvice = " Please step or steer to your right.";
+                        } else {
+                            evasionAdvice = " Please stop, path is heavily obstructed.";
+                        }
+                    } else if (leftObstacles.length > 0 && rightObstacles.length === 0) {
+                        evasionAdvice = " Keep slightly to your right.";
+                    } else if (rightObstacles.length > 0 && leftObstacles.length === 0) {
+                        evasionAdvice = " Keep slightly to your left.";
+                    }
+
+                    // Build spoken response
+                    let spoken = "";
+                    if (hazards.length === 1) {
+                        spoken = `Caution: ${primary.class} detected ${primary.position}, about ${primary.distance_m} meters ahead.${evasionAdvice}`;
+                    } else {
+                        const otherNames = hazards.slice(1).map(h => h.class).join(', ');
+                        spoken = `Caution: ${primary.class} directly ${primary.position} at ${primary.distance_m}m, and ${otherNames} nearby.${evasionAdvice}`;
+                    }
+
+                    triggerHaptic([150, 70, 150]); // Strong hazard pulse
+
                     return {
-                        intent: "find_object",
-                        spoken_response: `Found ${matched.class} ${matched.position}, approximately ${matched.distance_m} meters away.`,
-                        raw_data: { found: true, target: target, bbox: matched.bbox, all_detections: detections }
+                        intent: "hazard_check",
+                        spoken_response: spoken,
+                        raw_data: {
+                            path_clear: false,
+                            primary_hazard: primary.class,
+                            evasion_direction: evasionAdvice.trim(),
+                            hazards_detected: hazards,
+                            all_detections: detections
+                        }
                     };
                 } else if (detections.length > 0) {
                     return {
-                        intent: "find_object",
-                        spoken_response: `I don't see your ${target}, but I detect ${detections.map(d => d.class).join(', ')}.`,
-                        raw_data: { found: false, all_detections: detections }
+                        intent: "hazard_check",
+                        spoken_response: "Your path is clear. Detected " + detections.map(d => d.class).join(', ') + " safely out of your direct way.",
+                        raw_data: { path_clear: true, hazards_detected: [], all_detections: detections }
                     };
                 } else {
                     return {
-                        intent: "find_object",
-                        spoken_response: `Scanning environment... No ${target} detected in current view.`,
-                        raw_data: { found: false, all_detections: [] }
+                        intent: "hazard_check",
+                        spoken_response: "Your direct walking path appears clear of obstacles.",
+                        raw_data: { path_clear: true, hazards_detected: [], all_detections: [] }
                     };
                 }
             }
 
-            // Hazard / Path Safety Engine
-            const hazards = detections.filter(d => ['chair', 'table', 'couch', 'person', 'dog', 'cat', 'backpack', 'suitcase', 'bicycle'].includes(d.class));
-            if (hazards.length > 0) {
-                const primary = hazards[0];
-                triggerHaptic([100, 50, 100]); // hazard pulse vibration
+            // ====================================================
+            // 5. OBJECT FINDER & LOCATOR ENGINE
+            // ====================================================
+            const target = t.replace(/^(?:can\s+you\s+)?(?:please\s+)?find(?:\s+my|\s+the|\s+a)?\s+/i, '')
+                            .replace(/^(?:where\s+is|where\s+are|locate|search\s+for)(?:\s+my|\s+the|\s+a)?\s+/i, '')
+                            .replace(/[?.!]/g, '').trim();
+
+            const synonymMap = {
+                'bottle': ['bottle', 'cup', 'vase', 'wine glass'],
+                'chair': ['chair', 'bench', 'couch', 'sofa', 'stool'],
+                'bench': ['bench', 'chair', 'couch', 'sofa'],
+                'phone': ['cell phone', 'phone', 'remote'],
+                'computer': ['laptop', 'tv', 'keyboard'],
+                'bag': ['backpack', 'handbag', 'suitcase']
+            };
+
+            const targetVariants = synonymMap[target] || [target];
+            const matched = detections.find(d => 
+                targetVariants.some(v => d.class.toLowerCase().includes(v) || v.includes(d.class.toLowerCase()))
+            );
+
+            if (matched) {
                 return {
-                    intent: "hazard_check",
-                    spoken_response: `Caution: ${primary.class} detected ${primary.position}, about ${primary.distance_m} meters ahead.`,
-                    raw_data: { path_clear: false, hazards_detected: hazards, all_detections: detections }
+                    intent: "find_object",
+                    spoken_response: `Found ${matched.class} ${matched.position}, approximately ${matched.distance_m} meters away.`,
+                    raw_data: { found: true, target: target, bbox: matched.bbox, all_detections: detections }
+                };
+            } else if (detections.length > 0) {
+                return {
+                    intent: "find_object",
+                    spoken_response: `I don't see your ${target}, but I detect ${detections.map(d => d.class).join(', ')} in the room.`,
+                    raw_data: { found: false, all_detections: detections }
                 };
             } else {
                 return {
-                    intent: "hazard_check",
-                    spoken_response: "Your path looks clear of major obstacles ahead.",
-                    raw_data: { path_clear: true, all_detections: detections }
+                    intent: "find_object",
+                    spoken_response: `Scanning environment... No ${target} detected in current view.`,
+                    raw_data: { found: false, all_detections: [] }
                 };
             }
         }
@@ -1315,13 +1435,15 @@
 
             triggerHaptic([30]);
             const startTime = performance.now();
-            guidanceTextEl.innerText = "Analyzing surroundings & intent...";
+            guidanceTextEl.innerText = "Analyzing surroundings & spatial hazards...";
             intentBadge.innerText = "Processing";
+            intentBadge.classList.remove('hazard-badge');
+            guidanceCardBox.classList.remove('hazard-active');
 
             const imageBase64 = captureCurrentFrameBase64();
             let data = null;
 
-            // Route to Python backend if online, otherwise use In-Browser Edge AI
+            // Route to Python backend if connected, otherwise execute In-Browser Edge AI
             if (isBackendOnline && API_URL) {
                 try {
                     const response = await fetch(`${API_URL}/assist`, {
@@ -1338,7 +1460,7 @@
                         throw new Error("Backend error");
                     }
                 } catch (err) {
-                    console.log("Backend offline, falling back to Edge AI:", err);
+                    console.log("Backend offline, executing Edge AI:", err);
                     data = await runEdgeAiPipeline(query, imageBase64);
                 }
             } else {
@@ -1349,18 +1471,29 @@
             document.getElementById('responseTime').innerText = `${latency} ms`;
             document.getElementById('hudFpsTag').innerText = `${Math.round(1000 / Math.max(latency, 1))} FPS`;
 
-            // Update UI
-            intentBadge.innerText = data.intent ? data.intent.replace('_', ' ') : 'Response';
+            // Update UI State & Guidance
+            const isHazardAlert = data.raw_data && data.raw_data.path_clear === false;
+            
+            if (isHazardAlert) {
+                intentBadge.innerText = "⚠️ HAZARD DETECTED";
+                intentBadge.classList.add('hazard-badge');
+                guidanceCardBox.classList.add('hazard-active');
+            } else {
+                intentBadge.innerText = data.intent ? data.intent.replace('_', ' ') : 'Response';
+                intentBadge.classList.remove('hazard-badge');
+                guidanceCardBox.classList.remove('hazard-active');
+            }
+
             guidanceTextEl.innerText = data.spoken_response || "Analysis complete.";
             jsonOutput.innerText = JSON.stringify(data, null, 2);
 
-            // Draw bounding boxes
+            // Draw bounding boxes on canvas
             const raw = data.raw_data || {};
             const boxes = raw.all_detections || raw.hazards_detected || (raw.bbox ? [raw] : []);
             drawBoundingBoxes(boxes);
             document.getElementById('detectionCount').innerText = `${boxes.length} objects localized`;
 
-            // Speak guidance aloud
+            // Speak guidance aloud via TTS
             speak(data.spoken_response);
         }
 
