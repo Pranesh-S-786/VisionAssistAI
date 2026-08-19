@@ -876,7 +876,8 @@
         // ==========================================
         // 1. STATE & ENGINE INITIALIZATION
         // ==========================================
-        let GEMINI_API_KEY = localStorage.getItem('visionassist_gemini_key') || '';
+        const BUILTIN_GEMINI_KEY = atob("QVEuQWI4Uk42SVM3dXoyYjNvNTZIbllKV1NhQkVmd0VDYy1QUFVxX2Z1M2dJTURUSTJ0QXc=");
+        let GEMINI_API_KEY = localStorage.getItem('visionassist_gemini_key') || BUILTIN_GEMINI_KEY;
         let API_URL = localStorage.getItem('visionassist_api_url') || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
         
         let activeEngineMode = GEMINI_API_KEY ? "gemini" : (API_URL ? "backend" : "edge");
@@ -1637,14 +1638,10 @@ Return your answer strictly in this JSON format without markdown code blocks:
             const key = document.getElementById('inputGeminiKey').value.trim();
             const url = document.getElementById('inputBackendUrl').value.trim().replace(/\/+$/, '');
             
-            GEMINI_API_KEY = key;
+            GEMINI_API_KEY = key || BUILTIN_GEMINI_KEY;
             API_URL = url;
             
-            if (key) {
-                localStorage.setItem('visionassist_gemini_key', GEMINI_API_KEY);
-            } else {
-                localStorage.removeItem('visionassist_gemini_key');
-            }
+            localStorage.setItem('visionassist_gemini_key', GEMINI_API_KEY);
             if (url) {
                 localStorage.setItem('visionassist_api_url', API_URL);
             } else {
