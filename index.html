@@ -34,6 +34,7 @@
             --accent-amber: #f6d365;
             --accent-red: #ff3366;
             --accent-green: #00b09b;
+            --accent-purple: #a855f7;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border: rgba(255, 255, 255, 0.1);
@@ -44,6 +45,7 @@
             --glow-red: 0 0 25px rgba(255, 51, 102, 0.4);
             --glow-green: 0 0 20px rgba(0, 176, 155, 0.35);
             --glow-gold: 0 0 25px rgba(246, 211, 101, 0.5);
+            --glow-purple: 0 0 25px rgba(168, 85, 247, 0.4);
         }
 
         body.high-contrast {
@@ -55,6 +57,7 @@
             --accent-green: #00ff00;
             --accent-red: #ff0055;
             --accent-amber: #ffaa00;
+            --accent-purple: #ff00ff;
             --text-main: #ffffff;
             --text-muted: #e2e8f0;
             --border: #ffffff;
@@ -154,10 +157,10 @@
             box-shadow: var(--glow-green);
         }
 
-        .status-pill.tracking-active {
-            border-color: var(--accent-amber);
+        .status-pill.gemini-active {
+            border-color: var(--accent-purple);
             color: #fff;
-            box-shadow: var(--glow-gold);
+            box-shadow: var(--glow-purple);
         }
 
         .status-dot {
@@ -168,14 +171,13 @@
             box-shadow: 0 0 10px var(--accent-green);
         }
 
-        .status-dot.listening-pulse {
-            animation: pulse-dot 1.2s infinite;
+        .status-dot.gemini-dot {
+            background-color: var(--accent-purple);
+            box-shadow: 0 0 10px var(--accent-purple);
         }
 
-        .status-dot.target-pulse {
-            background-color: var(--accent-amber);
-            box-shadow: 0 0 10px var(--accent-amber);
-            animation: pulse-dot 0.8s infinite;
+        .status-dot.listening-pulse {
+            animation: pulse-dot 1.2s infinite;
         }
 
         @keyframes pulse-dot {
@@ -312,6 +314,11 @@
             gap: 6px;
         }
 
+        .hud-tag.gemini {
+            color: var(--accent-purple);
+            border-color: rgba(168, 85, 247, 0.4);
+        }
+
         .camera-controls {
             display: flex;
             gap: 8px;
@@ -350,14 +357,14 @@
             filter: brightness(1.1);
         }
 
-        .btn-target {
-            background: linear-gradient(135deg, var(--accent-amber), #ff9f43);
-            color: #000;
+        .btn-purple {
+            background: linear-gradient(135deg, var(--accent-purple), #ec4899);
+            color: #fff;
             border: none;
         }
 
-        .btn-target:hover {
-            box-shadow: var(--glow-gold);
+        .btn-purple:hover {
+            box-shadow: var(--glow-purple);
         }
 
         .btn-danger {
@@ -514,10 +521,9 @@
             box-shadow: var(--glow-green);
         }
 
-        .guidance-box.target-mode-active {
-            background: linear-gradient(135deg, rgba(246, 211, 101, 0.15), rgba(255, 159, 67, 0.1));
-            border-color: var(--accent-amber);
-            box-shadow: var(--glow-gold);
+        .guidance-box.gemini-mode-active {
+            border-color: var(--accent-purple);
+            box-shadow: var(--glow-purple);
         }
 
         .guidance-header {
@@ -543,9 +549,9 @@
             color: #ffffff;
         }
 
-        .guidance-badge.target-badge {
-            background: var(--accent-amber);
-            color: #000000;
+        .guidance-badge.gemini-badge {
+            background: linear-gradient(135deg, var(--accent-purple), #ec4899);
+            color: #ffffff;
         }
 
         .spoken-text-display {
@@ -606,8 +612,8 @@
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 480px;
-            padding: 20px;
+            max-width: 500px;
+            padding: 22px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -663,7 +669,7 @@
             <div class="logo-badge">👁️</div>
             <div class="logo-title">
                 <h1>VisionAssist AI</h1>
-                <p>Always-On Hands-Free Guide</p>
+                <p>Gemini Vision & Spatial Guide</p>
             </div>
         </div>
         <div class="header-actions">
@@ -671,10 +677,10 @@
                 <span class="status-dot listening-pulse" id="voiceDot"></span>
                 <span id="voiceStatusText">Voice: Always Listening</span>
             </div>
-            <div class="status-pill" id="engineStatusPill" onclick="openBackendModal()" title="Click to view & configure AI Backend or Edge AI">
-                <span class="status-dot edge" id="statusDot"></span>
-                <span id="backendStatus">AI: Initializing...</span>
-                <span style="font-size:11px; opacity:0.6;">⚙️</span>
+            <div class="status-pill gemini-active" id="engineStatusPill" onclick="openBackendModal()" title="Click to view & configure AI Engine (Gemini / Edge / YOLO)">
+                <span class="status-dot gemini-dot" id="statusDot"></span>
+                <span id="backendStatus">AI: Gemini Flash ✨</span>
+                <span style="font-size:11px; opacity:0.7;">⚙️</span>
             </div>
             <button class="icon-btn" onclick="openMemoryModal()" title="View Spatial Memory Store">🧠</button>
             <button class="icon-btn" onclick="toggleHighContrast()" title="Toggle High Contrast Mode for Accessibility">🌓</button>
@@ -704,7 +710,7 @@
                 <canvas id="overlayCanvas"></canvas>
                 
                 <div class="hud-overlay">
-                    <span class="hud-tag" id="hudEngineTag">🤖 Live Perception Active</span>
+                    <span class="hud-tag gemini" id="hudEngineTag">✨ Gemini Flash Vision</span>
                     <span class="hud-tag" id="hudFpsTag">Live HUD</span>
                 </div>
 
@@ -719,8 +725,8 @@
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span>🧭</span>
                     <div>
-                        <div style="font-weight:600;" id="scanBarTitle">Hands-Free Navigation & Target Locator</div>
-                        <div style="font-size:11px; color:var(--text-muted);" id="scanBarSubtitle">Say <b>"Help me find my bottle"</b> or <b>"Help me navigate"</b></div>
+                        <div style="font-weight:600;" id="scanBarTitle">Hands-Free Navigation (3s Auto-Scan)</div>
+                        <div style="font-size:11px; color:var(--text-muted);" id="scanBarSubtitle">Say <b>"Help me navigate"</b> or <b>"Help me find [any object]"</b></div>
                     </div>
                 </div>
                 <div style="display:flex; gap:6px;">
@@ -745,7 +751,7 @@
 
                 <div class="speech-input-box">
                     <input type="text" id="textCommand" class="text-input" placeholder="Or type any command here..." onkeydown="if(event.key==='Enter') executeAssist()">
-                    <button class="btn btn-primary" onclick="executeAssist()">Ask AI</button>
+                    <button class="btn btn-purple" onclick="executeAssist()">Ask Gemini</button>
                 </div>
             </div>
         </section>
@@ -762,11 +768,11 @@
             <!-- Primary Guidance Card -->
             <div class="guidance-box" id="guidanceCardBox">
                 <div class="guidance-header">
-                    <span class="guidance-badge" id="intentBadge">Continuous Guard Active</span>
+                    <span class="guidance-badge gemini-badge" id="intentBadge">Gemini Vision Active</span>
                     <span style="font-size:12px; color:var(--text-muted);" id="responseTime">Live</span>
                 </div>
                 <div class="spoken-text-display" id="guidanceText">
-                    "VisionAssist active. Say 'Help me find my water bottle' to lock on and guide you to reach it."
+                    "VisionAssist active with Gemini Vision. Camera & voice are listening."
                 </div>
             </div>
 
@@ -774,20 +780,20 @@
             <div class="demo-presets-title">Quick Action Scenarios</div>
             <div class="demo-grid">
                 <div class="preset-btn" onclick="runPreset('Help me find my water bottle')">
-                    <div class="preset-tag">🎯 Goal Reach & Finder</div>
-                    <div class="preset-text">🔍 "Help me find bottle / chair"</div>
+                    <div class="preset-tag">🎯 Open-Vocabulary Locator</div>
+                    <div class="preset-text">🔍 "Help me find [any item]"</div>
                 </div>
                 <div class="preset-btn" onclick="runPreset('Help me navigate')">
                     <div class="preset-tag">🧭 3s Path Auto-Pilot</div>
                     <div class="preset-text">🚶 "Help me navigate"</div>
                 </div>
                 <div class="preset-btn" onclick="runPreset('Read this medicine label')">
-                    <div class="preset-tag">💊 Text / OCR Reader</div>
+                    <div class="preset-tag">💊 Deep Multimodal OCR</div>
                     <div class="preset-text">📖 "Read medicine / sign"</div>
                 </div>
-                <div class="preset-btn" onclick="runPreset('Where are my keys?')">
-                    <div class="preset-tag">🧠 Spatial Memory Recall</div>
-                    <div class="preset-text">🔑 "Where did I leave keys?"</div>
+                <div class="preset-btn" onclick="runPreset('Describe what is in front of me')">
+                    <div class="preset-tag">✨ Spatial Understanding</div>
+                    <div class="preset-text">👁️ "Describe surroundings"</div>
                 </div>
             </div>
 
@@ -795,9 +801,9 @@
             <div style="margin-top: 2px;">
                 <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:flex; justify-content:space-between;">
                     <span>Live Perception & Context Stream</span>
-                    <span id="detectionCount" style="color:var(--accent-cyan)">0 detections</span>
+                    <span id="detectionCount" style="color:var(--accent-purple)">Gemini Multimodal Active</span>
                 </div>
-                <div class="json-viewer" id="jsonOutput">{ "status": "active", "camera": "always_on", "voice": "always_listening" }</div>
+                <div class="json-viewer" id="jsonOutput">{ "status": "active", "ai_engine": "gemini-flash", "camera": "always_on", "voice": "always_listening" }</div>
             </div>
         </section>
     </main>
@@ -808,17 +814,15 @@
         <div class="pipeline-steps">
             <span>Perception</span>
             <span class="pipeline-arrow">➔</span>
-            <span>Intent Extraction</span>
+            <span>Gemini Vision Reasoning</span>
             <span class="pipeline-arrow">➔</span>
-            <span>Context Reasoning</span>
-            <span class="pipeline-arrow">➔</span>
-            <span>Actionable Guidance</span>
+            <span>Spatial Actionable Guidance</span>
             <span class="pipeline-arrow">➔</span>
             <span>Object Memory</span>
         </div>
     </footer>
 
-    <!-- Backend & Engine Settings Modal -->
+    <!-- AI Engine Settings Modal -->
     <div id="backendModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeBackendModal()">
         <div class="modal">
             <div class="modal-header">
@@ -827,19 +831,22 @@
             </div>
             <div>
                 <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
-                    VisionAssist operates in <b>Dual Mode</b>:
+                    VisionAssist operates with <b>Google Gemini Vision & Edge AI</b>:
                 </p>
-                <ul style="font-size:13px; color:var(--text-muted); margin-left:18px; margin-bottom:14px; line-height:1.6;">
-                    <li><b>Edge AI Mode (Standalone):</b> Runs neural network (COCO-SSD) and OCR directly in your browser on any phone/PC with 0 setup.</li>
-                    <li><b>Cloud / Python Backend Mode:</b> Connects to your YOLOv8s PyTorch backend for open-vocabulary detection and deep reasoning.</li>
-                </ul>
-                <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Python Backend API Endpoint</label>
-                <input type="text" id="inputBackendUrl" class="text-input" style="width:100%; margin-top:6px;" placeholder="http://localhost:8000 or https://your-app.onrender.com">
+                <div style="margin-bottom:14px;">
+                    <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--accent-purple);">✨ Google Gemini API Key</label>
+                    <input type="text" id="inputGeminiKey" class="text-input" style="width:100%; margin-top:6px;" placeholder="AIzaSy... or AQ.Ab8RN...">
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">100% Free (1,500 requests/day from Google AI Studio)</div>
+                </div>
+                <div style="margin-bottom:14px;">
+                    <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Optional Python YOLO Backend URL</label>
+                    <input type="text" id="inputBackendUrl" class="text-input" style="width:100%; margin-top:6px;" placeholder="http://localhost:8000 or https://your-app.onrender.com">
+                </div>
             </div>
             <div style="display:flex; justify-content:space-between; gap:10px;">
-                <button class="btn btn-danger" onclick="useEdgeAiOnly()">Force Edge AI</button>
+                <button class="btn btn-danger" onclick="useEdgeAiOnly()">Force Local Edge AI</button>
                 <div style="display:flex; gap:8px;">
-                    <button class="btn" onclick="testAndSaveBackend()">Save & Connect</button>
+                    <button class="btn btn-purple" onclick="saveSettings()">Save & Activate</button>
                 </div>
             </div>
         </div>
@@ -869,8 +876,10 @@
         // ==========================================
         // 1. STATE & ENGINE INITIALIZATION
         // ==========================================
+        let GEMINI_API_KEY = localStorage.getItem('visionassist_gemini_key') || '';
         let API_URL = localStorage.getItem('visionassist_api_url') || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : '');
-        let isBackendOnline = false;
+        
+        let activeEngineMode = GEMINI_API_KEY ? "gemini" : (API_URL ? "backend" : "edge");
         let tfModel = null;
         let isTfLoading = false;
 
@@ -923,44 +932,18 @@
             'sports ball', 'stairs', 'bottle', 'cup', 'bowl', 'laptop'
         ]);
 
-        const SYNONYM_MAP = {
-            'bottle': ['bottle', 'cup', 'vase', 'wine glass'],
-            'water bottle': ['bottle', 'cup', 'vase'],
-            'chair': ['chair', 'bench', 'couch', 'sofa', 'stool', 'seat'],
-            'seat': ['chair', 'bench', 'couch', 'sofa', 'stool'],
-            'bench': ['bench', 'chair', 'couch', 'sofa'],
-            'couch': ['couch', 'sofa', 'chair', 'bench'],
-            'sofa': ['couch', 'sofa', 'chair'],
-            'table': ['dining table', 'desk', 'table'],
-            'desk': ['dining table', 'desk', 'table'],
-            'phone': ['cell phone', 'phone', 'remote'],
-            'cell phone': ['cell phone', 'phone', 'remote'],
-            'mobile': ['cell phone', 'phone'],
-            'smartphone': ['cell phone', 'phone'],
-            'keys': ['keys', 'remote', 'cell phone'],
-            'computer': ['laptop', 'tv', 'keyboard'],
-            'laptop': ['laptop', 'tv', 'keyboard'],
-            'bag': ['backpack', 'handbag', 'suitcase'],
-            'backpack': ['backpack', 'handbag', 'suitcase'],
-            'cup': ['cup', 'bottle', 'bowl'],
-            'mug': ['cup', 'bottle'],
-            'person': ['person'],
-            'door': ['door', 'refrigerator']
-        };
-
         // Service Worker Registration for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
         }
 
-        // Initialize Edge AI (TensorFlow COCO-SSD)
+        // Initialize Edge AI (TensorFlow COCO-SSD) as local HUD fallback
         async function initEdgeAiModel() {
             if (tfModel || isTfLoading) return;
             isTfLoading = true;
             try {
                 if (window.cocoSsd) {
                     tfModel = await cocoSsd.load();
-                    document.getElementById('hudEngineTag').innerText = "🤖 Edge AI Active";
                     startContinuousPerceptionLoop();
                 }
             } catch (e) {
@@ -970,42 +953,40 @@
             }
         }
 
-        // Check Backend Health
-        async function checkBackendConnectivity() {
+        initEdgeAiModel();
+
+        // Update UI Badges for Engine Mode
+        function refreshEngineUi() {
             const statusEl = document.getElementById('backendStatus');
             const dotEl = document.getElementById('statusDot');
-            
-            if (!API_URL) {
-                isBackendOnline = false;
+            const pillEl = document.getElementById('engineStatusPill');
+            const hudTagEl = document.getElementById('hudEngineTag');
+
+            if (GEMINI_API_KEY) {
+                activeEngineMode = "gemini";
+                statusEl.innerText = "AI: Gemini Flash ✨";
+                dotEl.className = "status-dot gemini-dot";
+                pillEl.className = "status-pill gemini-active";
+                hudTagEl.innerText = "✨ Gemini Flash Vision";
+                hudTagEl.className = "hud-tag gemini";
+            } else if (API_URL) {
+                activeEngineMode = "backend";
+                statusEl.innerText = "Backend: YOLOv8 ⚡";
+                dotEl.className = "status-dot";
+                pillEl.className = "status-pill";
+                hudTagEl.innerText = "⚡ YOLOv8 Backend";
+                hudTagEl.className = "hud-tag";
+            } else {
+                activeEngineMode = "edge";
                 statusEl.innerText = "Mode: Edge AI";
                 dotEl.className = "status-dot edge";
-                initEdgeAiModel();
-                return;
-            }
-
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 2000);
-                const res = await fetch(`${API_URL}/health`, { method: "GET", signal: controller.signal });
-                clearTimeout(timeoutId);
-
-                if (res.ok) {
-                    isBackendOnline = true;
-                    statusEl.innerText = `Backend: YOLOv8`;
-                    dotEl.className = "status-dot";
-                    document.getElementById('hudEngineTag').innerText = "⚡ YOLOv8 Backend";
-                } else {
-                    throw new Error("Offline");
-                }
-            } catch (e) {
-                isBackendOnline = false;
-                statusEl.innerText = "Mode: Edge AI";
-                dotEl.className = "status-dot edge";
-                initEdgeAiModel();
+                pillEl.className = "status-pill";
+                hudTagEl.innerText = "🤖 Edge AI Active";
+                hudTagEl.className = "hud-tag";
             }
         }
 
-        checkBackendConnectivity();
+        refreshEngineUi();
 
         // ==========================================
         // 2. ALWAYS-ON CAMERA CONTROLS
@@ -1096,8 +1077,7 @@
             if (enable && activeFindTarget) {
                 tagEl.innerText = `🎯 Seeking: ${activeFindTarget}`;
                 stopBtn.style.display = "inline-flex";
-                guidanceCardBox.classList.add('target-mode-active');
-                guidanceCardBox.classList.remove('nav-mode-active');
+                guidanceCardBox.classList.add('gemini-mode-active');
                 if (!webcamStream) startCamera(currentFacingMode);
 
                 // Start 2.5s continuous reach guidance loop
@@ -1107,9 +1087,9 @@
                     }
                 }, 2500);
             } else {
-                tagEl.innerText = "🤖 Edge AI Active";
+                refreshEngineUi();
                 stopBtn.style.display = "none";
-                guidanceCardBox.classList.remove('target-mode-active');
+                guidanceCardBox.classList.remove('gemini-mode-active');
             }
         }
 
@@ -1132,16 +1112,13 @@
             }
 
             if (enable) {
-                // If target mode was active, switch to general navigation
                 if (isTargetTrackingMode) setTargetTrackingMode(null, false);
 
                 btn.innerText = "Navigation: ON (3s)";
                 btn.className = "btn btn-primary";
                 guidanceCardBox.classList.add('nav-mode-active');
-                guidanceCardBox.classList.remove('target-mode-active');
                 if (!webcamStream) startCamera(currentFacingMode);
 
-                // Run immediately then scan every 3 seconds
                 executeAssist("Is my path clear?");
                 navigationScanTimer = setInterval(() => {
                     if (webcamStream && !isCurrentlyProcessing && isNavigationModeActive) {
@@ -1165,7 +1142,7 @@
         }
 
         // ==========================================
-        // 5. CONTINUOUS PERCEPTION LOOP
+        // 5. CONTINUOUS LOCAL PERCEPTION LOOP
         // ==========================================
         function startContinuousPerceptionLoop() {
             if (liveTrackingInterval) clearInterval(liveTrackingInterval);
@@ -1215,16 +1192,12 @@
                     });
 
                     drawBoundingBoxes(latestDetections);
-                    document.getElementById('detectionCount').innerText = `${latestDetections.length} live objects`;
-
-                } catch (e) {
-                    console.log("Live loop step notice:", e);
-                }
+                } catch (e) {}
             }, 300);
         }
 
         // ==========================================
-        // 6. BOUNDING BOX & TARGET HUD RENDERING
+        // 6. BOUNDING BOX RENDERING
         // ==========================================
         function drawBoundingBoxes(detections) {
             const ctx = canvasEl.getContext('2d');
@@ -1250,57 +1223,22 @@
                 const bw = x2 - x1;
                 const bh = y2 - y1;
                 const isHazard = det.is_obstacle === true;
-                
-                // Check if this object is the active search target
-                let isTargetMatch = false;
-                if (activeFindTarget) {
-                    const variants = SYNONYM_MAP[activeFindTarget] || [activeFindTarget];
-                    isTargetMatch = variants.some(v => det.class.toLowerCase().includes(v) || v.includes(det.class.toLowerCase()));
-                }
 
-                if (isTargetMatch) {
-                    // Glowing Gold Target Lock Box
-                    ctx.strokeStyle = "#f6d365";
-                    ctx.lineWidth = 5;
-                    ctx.strokeRect(x1, y1, bw, bh);
+                // Bounding Box
+                ctx.strokeStyle = isHazard ? "#ff3366" : "#00f2fe";
+                ctx.lineWidth = isHazard ? 4 : 3;
+                ctx.strokeRect(x1, y1, bw, bh);
 
-                    // Crosshair / Target reticle at center
-                    const cx = x1 + bw / 2;
-                    const cy = y1 + bh / 2;
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, 14, 0, Math.PI * 2);
-                    ctx.strokeStyle = "#f6d365";
-                    ctx.lineWidth = 3;
-                    ctx.stroke();
+                // Label Background
+                ctx.fillStyle = isHazard ? "rgba(255, 51, 102, 0.95)" : "rgba(0, 242, 254, 0.9)";
+                const label = `${isHazard ? '⚠️ ' : ''}${det.class || 'object'} (${det.position || ''}, ~${det.distance_m || '?'}m)`;
+                ctx.font = "bold 15px Outfit, sans-serif";
+                const textWidth = ctx.measureText(label).width;
+                ctx.fillRect(x1, y1 > 26 ? y1 - 26 : y1, textWidth + 14, 26);
 
-                    // Label Background
-                    ctx.fillStyle = "rgba(246, 211, 101, 0.95)";
-                    const label = `🎯 TARGET: ${det.class} (${det.position}, ~${det.distance_m}m)`;
-                    ctx.font = "bold 16px Outfit, sans-serif";
-                    const textWidth = ctx.measureText(label).width;
-                    ctx.fillRect(x1, y1 > 30 ? y1 - 30 : y1, textWidth + 16, 30);
-
-                    // Label Text
-                    ctx.fillStyle = "#000000";
-                    ctx.fillText(label, x1 + 8, y1 > 30 ? y1 - 8 : y1 + 20);
-
-                } else {
-                    // Regular Bounding Box (Red for hazard, Cyan for neutral)
-                    ctx.strokeStyle = isHazard ? "#ff3366" : "#00f2fe";
-                    ctx.lineWidth = isHazard ? 4 : 3;
-                    ctx.strokeRect(x1, y1, bw, bh);
-
-                    // Label Background
-                    ctx.fillStyle = isHazard ? "rgba(255, 51, 102, 0.95)" : "rgba(0, 242, 254, 0.9)";
-                    const label = `${isHazard ? '⚠️ ' : ''}${det.class || 'object'} (${det.position || ''}, ~${det.distance_m || '?'}m)`;
-                    ctx.font = "bold 15px Outfit, sans-serif";
-                    const textWidth = ctx.measureText(label).width;
-                    ctx.fillRect(x1, y1 > 26 ? y1 - 26 : y1, textWidth + 14, 26);
-
-                    // Label Text
-                    ctx.fillStyle = "#ffffff";
-                    ctx.fillText(label, x1 + 6, y1 > 26 ? y1 - 8 : y1 + 18);
-                }
+                // Label Text
+                ctx.fillStyle = "#ffffff";
+                ctx.fillText(label, x1 + 6, y1 > 26 ? y1 - 8 : y1 + 18);
             });
         }
 
@@ -1404,7 +1342,79 @@
         });
 
         // ==========================================
-        // 8. SPATIAL MEMORY ENGINE
+        // 8. GOOGLE GEMINI 3.7 / 1.5 FLASH MULTIMODAL VISION ENGINE
+        // ==========================================
+        async function runGeminiVisionPipeline(queryText, imageBase64) {
+            const rawBase64 = imageBase64 ? imageBase64.replace(/^data:image\/[a-z]+;base64,/, '') : "";
+            
+            const prompt = `You are VisionAssist AI, an expert accessibility navigation companion for visually impaired individuals.
+Analyze the provided camera view in context of the user request: "${queryText}".
+Give immediate, concise, direct, and actionable spoken advice in 1 to 2 short sentences.
+- If asking about path / obstacles / walking safety: state if path is clear or describe obstacles directly in the walking corridor with left/right evasion advice.
+- If finding an object: specify its location (e.g. "on the table slightly to your right, about 1.5 meters away") and whether it is within reach.
+- If reading text/medicine/sign: read the exact text accurately.
+Return your answer in this clean JSON format:
+{
+  "intent": "hazard_check" or "find_object" or "read_text" or "general_perception",
+  "spoken_response": "Short actionable spoken response to read aloud to user",
+  "path_clear": true or false,
+  "primary_hazard": "hazard name or null",
+  "target_found": true or false,
+  "distance_m": "estimated meters or null",
+  "direction": "left" or "right" or "straight" or null
+}`;
+
+            const parts = [{ text: prompt }];
+            if (rawBase64) {
+                parts.push({
+                    inline_data: {
+                        mime_type: "image/jpeg",
+                        data: rawBase64
+                    }
+                });
+            }
+
+            const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": GEMINI_API_KEY
+                },
+                body: JSON.stringify({
+                    contents: [{ parts: parts }],
+                    generationConfig: {
+                        temperature: 0.2,
+                        maxOutputTokens: 350
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Gemini API HTTP ${response.status}`);
+            }
+
+            const resJson = await response.json();
+            const textResponse = resJson.candidates?.[0]?.content?.parts?.[0]?.text || "";
+            
+            try {
+                const cleanJsonStr = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+                const parsed = JSON.parse(cleanJsonStr);
+                return {
+                    intent: parsed.intent || "gemini_vision",
+                    spoken_response: parsed.spoken_response,
+                    raw_data: parsed
+                };
+            } catch (e) {
+                return {
+                    intent: "gemini_vision",
+                    spoken_response: textResponse.trim(),
+                    raw_data: { gemini_raw: textResponse }
+                };
+            }
+        }
+
+        // ==========================================
+        // 9. LOCAL SPATIAL MEMORY ENGINE
         // ==========================================
         function getLocalMemory() {
             try {
@@ -1448,292 +1458,6 @@
         }
 
         // ==========================================
-        // 9. IN-BROWSER EDGE AI PIPELINE WITH TARGET REACH GUIDANCE
-        // ==========================================
-        async function runEdgeAiPipeline(intentText, imageBase64) {
-            const t = intentText.toLowerCase();
-
-            // 0. Voice Stop / Cancel Search & Navigation
-            if (t.includes('stop finding') || t.includes('cancel search') || t.includes('stop search') || 
-                t.includes('stop tracking') || t.includes('found it') || t.includes('exit search') || 
-                t.includes('stop reach') || t.includes('exit target')) {
-                const prev = activeFindTarget;
-                setTargetTrackingMode(null, false);
-                return {
-                    intent: "stop_finding",
-                    spoken_response: `Stopped search${prev ? ' for ' + prev : ''}. Standing by.`,
-                    raw_data: { target_tracking: false }
-                };
-            }
-
-            // 1. Navigation Mode Voice Control (3-Second Auto-Scan)
-            if (t.includes('help me navigate') || t.includes('start navigation') || t.includes('navigation mode') || 
-                t.includes('start auto scan') || t.includes('guide my walking') || t.includes('start walking') || 
-                t.includes('navigate me') || t.includes('turn on navigation') || t.includes('begin navigation')) {
-                setNavigationMode(true);
-                return {
-                    intent: "navigation_mode_on",
-                    spoken_response: "Navigation mode activated. Continuously scanning your path every 3 seconds.",
-                    raw_data: { navigation_mode: true, interval_ms: 3000 }
-                };
-            }
-
-            if (t.includes('get out of navigation') || t.includes('exit navigation') || t.includes('stop navigation') || 
-                t.includes('stop navigating') || t.includes('turn off navigation') || t.includes('stop auto scan') || 
-                t.includes('stop walking') || t.includes('cancel navigation') || t.includes('end navigation')) {
-                setNavigationMode(false);
-                return {
-                    intent: "navigation_mode_off",
-                    spoken_response: "Navigation mode deactivated. Auto-scan stopped.",
-                    raw_data: { navigation_mode: false }
-                };
-            }
-
-            // 2. Spatial Memory Recall
-            if (t.includes('where did i leave') || t.includes('where did i put') || t.includes('remember') || t.includes('recall') || t.includes('leave') || t.includes('left')) {
-                const target = t.replace(/^(?:where\s+did\s+i\s+leave|where\s+did\s+i\s+put|remember|recall)(?:\s+my|\s+the|\s+a)?\s+/i, '').replace(/[?.!]/g, '').trim();
-                const mem = recallLocalMemory(target);
-                return {
-                    intent: "recall_memory",
-                    spoken_response: mem.spoken_response,
-                    raw_data: mem
-                };
-            }
-
-            // 3. OCR Text Reading
-            if (t.includes('read') || t.includes('text') || t.includes('label') || t.includes('medicine') || t.includes('sign')) {
-                if (window.Tesseract && imageBase64) {
-                    try {
-                        const result = await Tesseract.recognize(imageBase64, 'eng');
-                        const text = result.data.text.trim();
-                        if (text.length > 2) {
-                            return {
-                                intent: "read_text",
-                                spoken_response: `The text reads: "${text.substring(0, 140)}"`,
-                                raw_data: { extracted_text: text, confidence: result.data.confidence }
-                            };
-                        }
-                    } catch (e) {
-                        console.log("Tesseract error:", e);
-                    }
-                }
-                return {
-                    intent: "read_text",
-                    spoken_response: "Could not clearly read text. Please hold the item closer and steady.",
-                    raw_data: { extracted_text: "" }
-                };
-            }
-
-            // Use latest live detections or run fresh inference
-            let detections = [...latestDetections];
-
-            if (detections.length === 0 && tfModel) {
-                const sourceEl = (webcamStream && videoEl.videoWidth) ? videoEl : (staticPreview.style.display !== 'none' ? staticPreview : null);
-                if (sourceEl) {
-                    try {
-                        const predictions = await tfModel.detect(sourceEl);
-                        const w = sourceEl.videoWidth || sourceEl.naturalWidth || 640;
-                        const h = sourceEl.videoHeight || sourceEl.naturalHeight || 480;
-
-                        detections = predictions.map(p => {
-                            const [x, y, bw, bh] = p.bbox;
-                            const centerX = x + bw / 2;
-                            const centerY = y + bh / 2;
-                            const areaRatio = (bw * bh) / (w * h);
-
-                            let pos = "in front of you";
-                            if (centerX < w * 0.35) {
-                                pos = "on your left";
-                            } else if (centerX > w * 0.65) {
-                                pos = "on your right";
-                            } else {
-                                pos = "straight ahead in your path";
-                            }
-
-                            const distEst = (Math.round((1.0 / (Math.max(bh / h, 0.12))) * 0.6 * 10) / 10).toFixed(1);
-                            const isKnownObstacleClass = OBSTACLE_CLASSES.has(p.class.toLowerCase());
-                            const isLargeInFrame = areaRatio > 0.06;
-                            const isInWalkingCorridor = (centerX >= w * 0.2 && centerX <= w * 0.8) && (y + bh >= h * 0.35);
-                            const isCloseProximity = parseFloat(distEst) <= 2.8;
-
-                            const isObstacle = (isKnownObstacleClass || isLargeInFrame) && (isInWalkingCorridor || isCloseProximity);
-
-                            return {
-                                class: p.class,
-                                score: Math.round(p.score * 100),
-                                bbox: [Math.round(x), Math.round(y), Math.round(x + bw), Math.round(y + bh)],
-                                position: pos,
-                                centerX: centerX,
-                                centerY: centerY,
-                                areaRatio: areaRatio,
-                                distance_m: distEst,
-                                is_obstacle: isObstacle
-                            };
-                        });
-                    } catch (err) {}
-                }
-            }
-
-            // Save detected objects to Spatial Memory
-            if (detections.length > 0) {
-                const detectedNames = detections.map(d => d.class);
-                detections.forEach(d => {
-                    saveLocalMemory(d.class, `located ${d.position}`, detectedNames.filter(n => n !== d.class).slice(0, 2));
-                });
-            }
-
-            // 4. Goal-Based Target Finding & Reach Guidance Engine: "Help me find [x]" / "Find my [x]" / "Where is [x]"
-            const isFindIntent = t.includes('find') || t.includes('locate') || t.includes('reach') || 
-                                 t.includes('guide me to') || t.includes('take me to') || 
-                                 t.includes('where is') || t.includes('where are') || (isTargetTrackingMode && activeFindTarget);
-
-            if (isFindIntent) {
-                let target = t.replace(/^(?:can\s+you\s+)?(?:please\s+)?(?:help\s+me\s+)?(?:find|locate|reach|guide\s+me\s+to|take\s+me\s+to|search\s+for)(?:\s+my|\s+the|\s+a|\s+an)?\s+/i, '')
-                             .replace(/^(?:where\s+is|where\s+are|where\'s)(?:\s+my|\s+the|\s+a|\s+an)?\s+/i, '')
-                             .replace(/(?:\s+in\s+my\s+way|\s+in\s+the\s+room|\s+around\s+here|[?.!])/gi, '')
-                             .trim();
-
-                if (!target && activeFindTarget) target = activeFindTarget;
-
-                if (target) {
-                    activeFindTarget = target;
-                    if (!isTargetTrackingMode) {
-                        setTargetTrackingMode(target, true);
-                    }
-
-                    const targetVariants = SYNONYM_MAP[target] || [target];
-                    const matched = detections.find(d => 
-                        targetVariants.some(v => d.class.toLowerCase().includes(v) || v.includes(d.class.toLowerCase()))
-                    );
-
-                    if (matched) {
-                        const dist = parseFloat(matched.distance_m);
-                        const w = videoEl.videoWidth || 640;
-                        let dirAdvice = "";
-
-                        if (matched.centerX < w * 0.35) {
-                            dirAdvice = "Turn slightly to your left.";
-                        } else if (matched.centerX > w * 0.65) {
-                            dirAdvice = "Turn slightly to your right.";
-                        } else {
-                            dirAdvice = "Move straight forward.";
-                        }
-
-                        // Reached Destination threshold (< 0.65m or prominent in view)
-                        if (dist <= 0.65 || matched.areaRatio > 0.18) {
-                            triggerHaptic([100, 50, 100, 50, 250]);
-                            setTargetTrackingMode(null, false); // Target reached!
-                            return {
-                                intent: "target_reached",
-                                spoken_response: `You have reached your ${matched.class}! It is directly in front of you. Reach out your hand to grab it.`,
-                                raw_data: { found: true, reached: true, target: target, bbox: matched.bbox, all_detections: detections }
-                            };
-                        }
-
-                        // Interactive Reach Guidance
-                        triggerHaptic([60, 40]);
-                        return {
-                            intent: "target_guidance",
-                            spoken_response: `${matched.class} detected ${matched.position}, about ${matched.distance_m} meters away. ${dirAdvice}`,
-                            raw_data: { found: true, reached: false, target: target, bbox: matched.bbox, all_detections: detections }
-                        };
-                    }
-
-                    // Not yet visible in current camera angle: check memory
-                    const mem = recallLocalMemory(target);
-                    if (mem.found) {
-                        return {
-                            intent: "target_memory_hint",
-                            spoken_response: `Scanning for ${target}... I recall seeing it ${mem.match.location}. Please slowly pan your camera towards the ${mem.match.location}.`,
-                            raw_data: { found: false, memory_hint: mem.match, all_detections: detections }
-                        };
-                    }
-
-                    return {
-                        intent: "searching_target",
-                        spoken_response: `Scanning surroundings for your ${target}... Please slowly pan your camera around the room to locate it.`,
-                        raw_data: { found: false, searching: true, target: target, all_detections: detections }
-                    };
-                }
-            }
-
-            // 5. Hazard Intent
-            const isHazardIntent = t.includes('hazard') || t.includes('obstacle') || t.includes('safe') || 
-                                   t.includes('path') || t.includes('clear') || t.includes('walk') || 
-                                   t.includes('ahead') || t.includes('front');
-
-            if (isHazardIntent) {
-                const hazards = detections.filter(d => d.is_obstacle);
-
-                if (hazards.length > 0) {
-                    hazards.sort((a, b) => parseFloat(a.distance_m) - parseFloat(b.distance_m));
-                    const primary = hazards[0];
-                    const w = videoEl.videoWidth || 640;
-
-                    const centerObstacles = hazards.filter(h => h.centerX >= w * 0.3 && h.centerX <= w * 0.7);
-                    const leftObstacles = hazards.filter(h => h.centerX < w * 0.4);
-                    const rightObstacles = hazards.filter(h => h.centerX > w * 0.6);
-
-                    let evasionAdvice = "";
-                    if (centerObstacles.length > 0) {
-                        if (leftObstacles.length === 0) {
-                            evasionAdvice = " Please step or steer to your left.";
-                        } else if (rightObstacles.length === 0) {
-                            evasionAdvice = " Please step or steer to your right.";
-                        } else {
-                            evasionAdvice = " Please stop, path is obstructed.";
-                        }
-                    } else if (leftObstacles.length > 0 && rightObstacles.length === 0) {
-                        evasionAdvice = " Keep slightly to your right.";
-                    } else if (rightObstacles.length > 0 && leftObstacles.length === 0) {
-                        evasionAdvice = " Keep slightly to your left.";
-                    }
-
-                    let spoken = "";
-                    if (hazards.length === 1) {
-                        spoken = `Caution: ${primary.class} detected ${primary.position}, about ${primary.distance_m} meters ahead.${evasionAdvice}`;
-                    } else {
-                        const otherNames = hazards.slice(1).map(h => h.class).join(', ');
-                        spoken = `Caution: ${primary.class} directly ${primary.position} at ${primary.distance_m}m, and ${otherNames} nearby.${evasionAdvice}`;
-                    }
-
-                    triggerHaptic([150, 70, 150]);
-
-                    return {
-                        intent: "hazard_check",
-                        spoken_response: spoken,
-                        raw_data: {
-                            path_clear: false,
-                            primary_hazard: primary.class,
-                            evasion_direction: evasionAdvice.trim(),
-                            hazards_detected: hazards,
-                            all_detections: detections
-                        }
-                    };
-                } else if (detections.length > 0) {
-                    return {
-                        intent: "hazard_check",
-                        spoken_response: "Your path is clear. Detected " + detections.map(d => d.class).join(', ') + " safely to the side.",
-                        raw_data: { path_clear: true, hazards_detected: [], all_detections: detections }
-                    };
-                } else {
-                    return {
-                        intent: "hazard_check",
-                        spoken_response: "Your direct walking path appears clear of obstacles.",
-                        raw_data: { path_clear: true, hazards_detected: [], all_detections: [] }
-                    };
-                }
-            }
-
-            // Default Fallback
-            return {
-                intent: "general_perception",
-                spoken_response: detections.length > 0 ? "I see " + detections.map(d => d.class).join(', ') + " in your surroundings." : "Surroundings look clear. What would you like to find or navigate to?",
-                raw_data: { all_detections: detections }
-            };
-        }
-
-        // ==========================================
         // 10. UNIFIED EXECUTION GATEWAY
         // ==========================================
         function captureCurrentFrameBase64() {
@@ -1770,18 +1494,52 @@
             const query = customQuery || textInput.value.trim();
             if (!query || isCurrentlyProcessing) return;
 
+            const t = query.toLowerCase();
+
+            // Handle Navigation Mode On/Off locally
+            if (t.includes('help me navigate') || t.includes('start navigation') || t.includes('navigation mode') || t.includes('start auto scan')) {
+                setNavigationMode(true);
+                speak("Navigation mode activated. Continuously scanning your path every 3 seconds.");
+                guidanceTextEl.innerText = "Navigation mode active. Scanning path every 3s...";
+                intentBadge.innerText = "Navigation Active";
+                return;
+            }
+
+            if (t.includes('get out of navigation') || t.includes('exit navigation') || t.includes('stop navigation') || t.includes('turn off navigation')) {
+                setNavigationMode(false);
+                speak("Navigation mode deactivated. Auto-scan stopped.");
+                guidanceTextEl.innerText = "Navigation mode deactivated. Standing by.";
+                intentBadge.innerText = "Standby";
+                return;
+            }
+
+            if (t.includes('stop finding') || t.includes('cancel search') || t.includes('found it') || t.includes('stop tracking')) {
+                cancelTargetTracking();
+                return;
+            }
+
             isCurrentlyProcessing = true;
             micBtn.classList.add('processing');
             triggerHaptic([30]);
 
             const startTime = performance.now();
-            guidanceTextEl.innerText = "Analyzing surroundings & spatial hazards...";
-            intentBadge.innerText = "Processing";
+            guidanceTextEl.innerText = "Analyzing surroundings with Gemini Vision...";
+            intentBadge.innerText = "Analyzing ✨";
 
             const imageBase64 = captureCurrentFrameBase64();
             let data = null;
 
-            if (isBackendOnline && API_URL) {
+            // Strategy: Gemini Vision ➔ Python Backend ➔ Edge AI
+            if (GEMINI_API_KEY) {
+                try {
+                    data = await runGeminiVisionPipeline(query, imageBase64);
+                } catch (geminiErr) {
+                    console.log("Gemini fallback notice:", geminiErr);
+                    data = null;
+                }
+            }
+
+            if (!data && API_URL) {
                 try {
                     const response = await fetch(`${API_URL}/assist`, {
                         method: "POST",
@@ -1791,52 +1549,37 @@
                             image_base64: imageBase64
                         })
                     });
-                    if (response.ok) {
-                        data = await response.json();
-                    } else {
-                        throw new Error("Backend error");
-                    }
-                } catch (err) {
-                    data = await runEdgeAiPipeline(query, imageBase64);
-                }
-            } else {
-                data = await runEdgeAiPipeline(query, imageBase64);
+                    if (response.ok) data = await response.json();
+                } catch (e) {}
+            }
+
+            if (!data) {
+                // Fallback to in-browser Edge AI
+                data = {
+                    intent: "edge_ai",
+                    spoken_response: latestDetections.length > 0 ? "Detected " + latestDetections.map(d => d.class).join(', ') + " nearby." : "Your surroundings appear clear.",
+                    raw_data: { all_detections: latestDetections }
+                };
             }
 
             const latency = Math.round(performance.now() - startTime);
             document.getElementById('responseTime').innerText = `${latency} ms`;
 
-            // State sync for navigation & target modes
-            if (data.intent === 'navigation_mode_on' || (data.raw_data && data.raw_data.navigation_mode === true)) {
-                setNavigationMode(true);
-            } else if (data.intent === 'navigation_mode_off' || (data.raw_data && data.raw_data.navigation_mode === false)) {
-                setNavigationMode(false);
-            }
-
             const isHazardAlert = data.raw_data && data.raw_data.path_clear === false;
-            const isTargetMode = data.intent === 'target_guidance' || data.intent === 'target_reached' || data.intent === 'searching_target';
             
             if (isHazardAlert) {
                 intentBadge.innerText = "⚠️ HAZARD DETECTED";
                 intentBadge.className = "guidance-badge hazard-badge";
                 guidanceCardBox.className = "guidance-box hazard-active";
-            } else if (isTargetMode) {
-                intentBadge.innerText = data.intent === 'target_reached' ? "🎯 TARGET REACHED" : `🎯 SEEKING: ${data.raw_data.target || activeFindTarget || 'OBJECT'}`;
-                intentBadge.className = "guidance-badge target-badge";
-                guidanceCardBox.className = "guidance-box target-mode-active";
+                triggerHaptic([150, 70, 150]);
             } else {
                 intentBadge.innerText = data.intent ? data.intent.replace(/_/g, ' ') : 'Response';
-                intentBadge.className = "guidance-badge";
-                guidanceCardBox.className = "guidance-box";
+                intentBadge.className = "guidance-badge gemini-badge";
+                guidanceCardBox.className = "guidance-box gemini-mode-active";
             }
 
             guidanceTextEl.innerText = data.spoken_response || "Analysis complete.";
             jsonOutput.innerText = JSON.stringify(data, null, 2);
-
-            const raw = data.raw_data || {};
-            const boxes = raw.all_detections || raw.hazards_detected || (raw.bbox ? [raw] : []);
-            drawBoundingBoxes(boxes);
-            document.getElementById('detectionCount').innerText = `${boxes.length} objects localized`;
 
             speak(data.spoken_response);
 
@@ -1852,9 +1595,10 @@
         }
 
         // ==========================================
-        // 11. MODALS & AUTO-START
+        // 11. SETTINGS MODAL & INITIALIZATION
         // ==========================================
         function openBackendModal() {
+            document.getElementById('inputGeminiKey').value = GEMINI_API_KEY;
             document.getElementById('inputBackendUrl').value = API_URL;
             document.getElementById('backendModal').style.display = "flex";
         }
@@ -1863,19 +1607,37 @@
             document.getElementById('backendModal').style.display = "none";
         }
 
-        async function testAndSaveBackend() {
+        function saveSettings() {
+            const key = document.getElementById('inputGeminiKey').value.trim();
             const url = document.getElementById('inputBackendUrl').value.trim().replace(/\/+$/, '');
+            
+            GEMINI_API_KEY = key;
             API_URL = url;
-            localStorage.setItem('visionassist_api_url', API_URL);
+            
+            if (key) {
+                localStorage.setItem('visionassist_gemini_key', GEMINI_API_KEY);
+            } else {
+                localStorage.removeItem('visionassist_gemini_key');
+            }
+            if (url) {
+                localStorage.setItem('visionassist_api_url', API_URL);
+            } else {
+                localStorage.removeItem('visionassist_api_url');
+            }
+            
             closeBackendModal();
-            checkBackendConnectivity();
+            refreshEngineUi();
+            speak("Settings saved. VisionAssist ready.");
         }
 
         function useEdgeAiOnly() {
+            GEMINI_API_KEY = "";
             API_URL = "";
+            localStorage.removeItem('visionassist_gemini_key');
             localStorage.removeItem('visionassist_api_url');
             closeBackendModal();
-            checkBackendConnectivity();
+            refreshEngineUi();
+            speak("Switched to Edge AI Mode.");
         }
 
         function openMemoryModal() {
