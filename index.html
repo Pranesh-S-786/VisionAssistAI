@@ -1001,9 +1001,15 @@
         // ==========================================
         async function startCamera(facingMode = "environment") {
             try {
-                if (webcamStream) {
+                // If camera is already active on the same facingMode, DO NOT recreate stream to avoid mobile permission toggle!
+                if (webcamStream && webcamStream.active && webcamStream.getVideoTracks().some(t => t.readyState === 'live')) {
+                    if (currentFacingMode === facingMode) {
+                        return;
+                    }
                     webcamStream.getTracks().forEach(t => t.stop());
                 }
+
+                currentFacingMode = facingMode;
 
                 // Request high-resolution sensor feed with continuous autofocus & exposure
                 const constraints = {
@@ -1061,8 +1067,12 @@
         }
 
         async function switchCameraFacing() {
-            currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
-            await startCamera(currentFacingMode);
+            const nextMode = currentFacingMode === "environment" ? "user" : "environment";
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(t => t.stop());
+                webcamStream = null;
+            }
+            await startCamera(nextMode);
         }
 
         async function toggleTorch() {
@@ -1079,8 +1089,8 @@
         }
 
         function ensureCameraAndVoice() {
-            if (!webcamStream) startCamera(currentFacingMode);
-            if (!isListening) startSpeechRecognitionLoop();
+            if (!webcamStream || !webcamStream.active) startCamera(currentFacingMode);
+            if (!isListening && !isAiSpeaking) startSpeechRecognitionLoop();
         }
 
         // ==========================================
@@ -1429,8 +1439,12 @@
         }
 
         // ==========================================
-        // 7. ALWAYS-ON VOICE COMMAND LISTENER (STT & TTS)
+        // 7. ALWAYS-ON VOICE COMMAND LISTENER & AUDIO ARBITER (MOBILE STABILIZED)
         // ==========================================
+        let isAiSpeaking = false;
+        let isSpeechRecStarting = false;
+        let speechKeepAliveTimer = null;
+
         function triggerHaptic(pattern = [50]) {
             if (navigator.vibrate) {
                 try { navigator.vibrate(pattern); } catch (e) {}
@@ -1439,11 +1453,55 @@
 
         function speak(text) {
             if (!('speechSynthesis' in window) || !text) return;
+
+            // Stop any ongoing speech and timers cleanly
             window.speechSynthesis.cancel();
+            if (speechKeepAliveTimer) clearInterval(speechKeepAliveTimer);
+
             lastSpokenText = text;
+            isAiSpeaking = true;
+
+            // Pause speech recognition gracefully during TTS so phone mic doesn't fight speaker
+            if (speechRecognition && isListening) {
+                try { speechRecognition.abort(); } catch (e) {}
+            }
+
             const utter = new SpeechSynthesisUtterance(text);
-            utter.rate = 1.1;
+            utter.rate = 1.05;
             utter.pitch = 1.0;
+            utter.lang = 'en-US';
+
+            // Mobile Chrome/Safari freeze watchdog: keeps long sentences reading completely to end
+            speechKeepAliveTimer = setInterval(() => {
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.pause();
+                    window.speechSynthesis.resume();
+                } else {
+                    clearInterval(speechKeepAliveTimer);
+                }
+            }, 3500);
+
+            utter.onend = () => {
+                isAiSpeaking = false;
+                if (speechKeepAliveTimer) clearInterval(speechKeepAliveTimer);
+                // 350ms acoustic decay before resuming voice listener cleanly
+                setTimeout(() => {
+                    if (isAlwaysListening && !isAiSpeaking) {
+                        startSpeechRecognitionLoop();
+                    }
+                }, 350);
+            };
+
+            utter.onerror = () => {
+                isAiSpeaking = false;
+                if (speechKeepAliveTimer) clearInterval(speechKeepAliveTimer);
+                setTimeout(() => {
+                    if (isAlwaysListening && !isAiSpeaking) {
+                        startSpeechRecognitionLoop();
+                    }
+                }, 350);
+            };
+
             window.speechSynthesis.speak(utter);
         }
 
@@ -1452,7 +1510,7 @@
             speak(lastSpokenText);
         }
 
-        // Speech-to-Text Setup with Instant Voice Interruption
+        // Speech-to-Text Setup with Crash-Proof State Machine
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRec) {
             speechRecognition = new SpeechRec();
@@ -1460,15 +1518,9 @@
             speechRecognition.interimResults = true;
             speechRecognition.lang = 'en-US';
 
-            speechRecognition.onspeechstart = () => {
-                // When user speaks, immediately cut off AI voice so mic hears cleanly
-                if (window.speechSynthesis && window.speechSynthesis.speaking) {
-                    window.speechSynthesis.cancel();
-                }
-            };
-
             speechRecognition.onstart = () => {
                 isListening = true;
+                isSpeechRecStarting = false;
                 micBtn.classList.add('always-listening');
                 voiceStatusPill.classList.add('active-listening');
                 voiceStatusText.innerText = isTargetTrackingMode ? `Seeking: ${activeFindTarget}` : "Voice: Always Listening";
@@ -1476,12 +1528,15 @@
             };
 
             speechRecognition.onresult = (e) => {
+                // If AI is currently speaking, do not allow mic echo to trigger commands
+                if (isAiSpeaking) return;
+
                 const results = e.results;
                 const latestResult = results[results.length - 1];
                 const rawTranscript = latestResult[0].transcript.trim();
                 const t = rawTranscript.toLowerCase();
 
-                // Ultra-Fast Stop Check on ANY utterance (interim or final)
+                // Ultra-Fast Stop Check on ANY utterance
                 const STOP_PHRASES = ['stop', 'cancel', 'halt', 'quit', 'exit', 'shut up', 'quiet', 'silence', 'pause', 'hush', 'found it', 'stop it', 'stop finding', 'stop tracking', 'stop navigation', 'enough'];
                 const isStopTriggered = STOP_PHRASES.some(w => t === w || t.startsWith(w + ' ') || t.endsWith(' ' + w) || t.includes('stop'));
 
@@ -1507,16 +1562,18 @@
             };
 
             speechRecognition.onerror = (e) => {
-                if (isAlwaysListening && e.error !== 'aborted') {
-                    setTimeout(() => startSpeechRecognitionLoop(), 600);
+                isSpeechRecStarting = false;
+                if (isAlwaysListening && !isAiSpeaking && e.error !== 'aborted') {
+                    setTimeout(() => startSpeechRecognitionLoop(), 800);
                 }
             };
 
             speechRecognition.onend = () => {
                 isListening = false;
-                if (isAlwaysListening) {
-                    setTimeout(() => startSpeechRecognitionLoop(), 200);
-                } else {
+                isSpeechRecStarting = false;
+                if (isAlwaysListening && !isAiSpeaking) {
+                    setTimeout(() => startSpeechRecognitionLoop(), 400);
+                } else if (!isAlwaysListening) {
                     micBtn.classList.remove('always-listening');
                     voiceStatusPill.classList.remove('active-listening');
                     voiceStatusText.innerText = "Voice: Paused";
@@ -1526,10 +1583,13 @@
         }
 
         function startSpeechRecognitionLoop() {
-            if (!speechRecognition) return;
+            if (!speechRecognition || isListening || isSpeechRecStarting || isAiSpeaking) return;
             try {
+                isSpeechRecStarting = true;
                 speechRecognition.start();
-            } catch (e) {}
+            } catch (e) {
+                isSpeechRecStarting = false;
+            }
         }
 
         function toggleAlwaysListening() {
@@ -1538,7 +1598,9 @@
                 startSpeechRecognitionLoop();
                 triggerHaptic([50]);
             } else {
-                if (speechRecognition) speechRecognition.stop();
+                if (speechRecognition) {
+                    try { speechRecognition.stop(); } catch (e) {}
+                }
                 triggerHaptic([30]);
             }
         }
