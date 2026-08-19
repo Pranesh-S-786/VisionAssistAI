@@ -1071,6 +1071,10 @@
         // 3. AUTONOMOUS CONTINUOUS TARGET LOCATOR & REACH GUIDANCE
         // ==========================================
         const TARGET_SYNONYMS = {
+            'charger': ['cell phone', 'remote', 'mouse', 'keyboard', 'laptop', 'cable', 'wire', 'plug', 'electronic', 'bottle', 'cup'],
+            'phone charger': ['cell phone', 'remote', 'mouse', 'cable', 'wire', 'plug'],
+            'cable': ['cell phone', 'remote', 'mouse', 'wire'],
+            'wire': ['cell phone', 'remote', 'mouse', 'cable'],
             'water bottle': ['bottle', 'cup', 'wine glass', 'bowl', 'vase'],
             'bottle': ['bottle', 'cup', 'wine glass', 'vase'],
             'phone': ['cell phone', 'remote', 'mouse'],
@@ -1097,10 +1101,12 @@
 
         let lastTargetSpeakTime = 0;
         let lastNotFoundSpeakTime = 0;
+        let lastSpokenGuidance = "";
 
         function setTargetTrackingMode(targetName, enable) {
             isTargetTrackingMode = enable;
             activeFindTarget = enable ? targetName.toLowerCase().trim() : null;
+            lastSpokenGuidance = "";
 
             if (targetTrackingTimer) {
                 clearInterval(targetTrackingTimer);
@@ -1120,17 +1126,20 @@
                 intentBadge.className = "guidance-badge target-badge";
                 
                 guidanceTextEl.innerText = `Target mode locked on ${activeFindTarget}. Walk and move your camera freely.`;
-                speak(`Looking for your ${activeFindTarget}. Keep your camera pointed forward and walk naturally. I will guide you continuously.`);
+                speak(`Looking for your ${activeFindTarget}. Point your camera forward as you walk. Say stop anytime.`);
                 triggerHaptic([60, 40, 60]);
+
+                lastTargetSpeakTime = performance.now();
+                lastNotFoundSpeakTime = performance.now();
 
                 if (!webcamStream) startCamera(currentFacingMode);
 
-                // Run fast continuous reach guidance watchdog every 2.0s
+                // Run smooth reach guidance watchdog every 1.5s
                 targetTrackingTimer = setInterval(() => {
                     if (isTargetTrackingMode && activeFindTarget && webcamStream) {
                         runTargetReachTick();
                     }
-                }, 2000);
+                }, 1500);
             } else {
                 refreshEngineUi();
                 stopBtn.style.display = "none";
@@ -1143,7 +1152,7 @@
         function cancelTargetTracking() {
             const prev = activeFindTarget;
             setTargetTrackingMode(null, false);
-            speak(`Stopped search${prev ? ' for ' + prev : ''}. Standing by.`);
+            window.speechSynthesis.cancel();
             guidanceTextEl.innerText = "Target tracking stopped. Standing by.";
         }
 
@@ -1185,7 +1194,7 @@
                     guidanceTextEl.innerText = msg;
                     speak(msg);
                     saveLocalMemory(activeFindTarget, "directly in front of you", [matched.class]);
-                    // Hold and pause tracking
+                    // Auto complete search
                     setTargetTrackingMode(null, false);
                 } else {
                     // Step-by-step walking guidance
@@ -1199,21 +1208,23 @@
                     const msg = `${steer}. ${activeFindTarget} is ${distNum} meters ahead.`;
                     guidanceTextEl.innerText = msg;
 
-                    if (now - lastTargetSpeakTime > 2200) {
+                    // Speak at most every 3.5s or if direction changes
+                    if (now - lastTargetSpeakTime > 3500 && (msg !== lastSpokenGuidance || now - lastTargetSpeakTime > 6000)) {
                         speak(msg);
                         triggerHaptic([40]);
+                        lastSpokenGuidance = msg;
                         lastTargetSpeakTime = now;
                     }
                 }
             } else {
-                // Not visible in current camera angle
-                if (now - lastNotFoundSpeakTime > 4500) {
+                // Not visible in current camera angle -> Stay quiet, give subtle reminder only every 12 seconds
+                if (now - lastNotFoundSpeakTime > 12000) {
                     const mem = recallLocalMemory(activeFindTarget);
                     if (mem.found) {
                         guidanceTextEl.innerText = mem.spoken_response;
                         speak(mem.spoken_response);
                     } else {
-                        const msg = `Scanning for ${activeFindTarget}... slowly pan your camera around the room.`;
+                        const msg = `Still scanning for your ${activeFindTarget}. Slowly pan your camera around.`;
                         guidanceTextEl.innerText = msg;
                         speak(msg);
                     }
@@ -1425,7 +1436,7 @@
             speak(lastSpokenText);
         }
 
-        // Speech-to-Text Setup with Continuous Automatic Restart
+        // Speech-to-Text Setup with Instant Voice Interruption
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRec) {
             speechRecognition = new SpeechRec();
@@ -1433,38 +1444,60 @@
             speechRecognition.interimResults = false;
             speechRecognition.lang = 'en-US';
 
+            speechRecognition.onspeechstart = () => {
+                // When user speaks, immediately cut off AI voice so mic hears cleanly
+                if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
+            };
+
             speechRecognition.onstart = () => {
                 isListening = true;
                 micBtn.classList.add('always-listening');
                 voiceStatusPill.classList.add('active-listening');
                 voiceStatusText.innerText = isTargetTrackingMode ? `Seeking: ${activeFindTarget}` : "Voice: Always Listening";
-                micStatus.innerText = "Listening continuously: Speak your command naturally";
+                micStatus.innerText = "Listening continuously: Speak naturally. Say 'stop' anytime.";
             };
 
             speechRecognition.onresult = (e) => {
                 const results = e.results;
                 const latestResult = results[results.length - 1];
                 if (latestResult.isFinal) {
-                    const transcript = latestResult[0].transcript.trim();
-                    if (transcript.length > 1) {
-                        textInput.value = transcript;
-                        micStatus.innerText = `Heard: "${transcript}"`;
+                    const rawTranscript = latestResult[0].transcript.trim();
+                    const t = rawTranscript.toLowerCase();
+
+                    // CRITICAL: Highest priority STOP & INTERRUPT listener
+                    const STOP_PHRASES = ['stop', 'cancel', 'halt', 'quit', 'exit', 'shut up', 'quiet', 'silence', 'pause', 'hush', 'found it', 'stop it', 'stop finding', 'stop tracking', 'stop navigation', 'enough'];
+                    const isStopTriggered = STOP_PHRASES.some(w => t === w || t.startsWith(w + ' ') || t.endsWith(' ' + w) || t.includes('stop'));
+
+                    if (isStopTriggered) {
+                        window.speechSynthesis.cancel();
+                        cancelTargetTracking();
+                        if (isNavigationModeActive) setNavigationMode(false);
+                        triggerHaptic([100, 50, 100]);
+                        speak("Stopped. Standing by.");
+                        return;
+                    }
+
+                    if (rawTranscript.length > 1) {
+                        textInput.value = rawTranscript;
+                        micStatus.innerText = `Heard: "${rawTranscript}"`;
                         triggerHaptic([40, 30]);
-                        executeAssist(transcript);
+                        executeAssist(rawTranscript);
                     }
                 }
             };
 
             speechRecognition.onerror = (e) => {
                 if (isAlwaysListening && e.error !== 'aborted') {
-                    setTimeout(() => startSpeechRecognitionLoop(), 800);
+                    setTimeout(() => startSpeechRecognitionLoop(), 600);
                 }
             };
 
             speechRecognition.onend = () => {
                 isListening = false;
                 if (isAlwaysListening) {
-                    setTimeout(() => startSpeechRecognitionLoop(), 300);
+                    setTimeout(() => startSpeechRecognitionLoop(), 200);
                 } else {
                     micBtn.classList.remove('always-listening');
                     voiceStatusPill.classList.remove('active-listening');
@@ -1665,7 +1698,20 @@ Return answer in clean JSON:
 
             const t = query.toLowerCase();
 
-            // 1. Navigation Mode On/Off locally (0ms latency)
+            // 1. Instant Stop & Cancel Handlers (0ms latency)
+            const STOP_COMMANDS = ['stop', 'cancel', 'halt', 'quit', 'exit', 'shut up', 'quiet', 'silence', 'pause', 'hush', 'found it', 'stop it', 'stop finding', 'stop tracking', 'stop navigation', 'enough'];
+            if (STOP_COMMANDS.some(w => t === w || t.startsWith(w + ' ') || t.endsWith(' ' + w) || t.includes('stop'))) {
+                window.speechSynthesis.cancel();
+                cancelTargetTracking();
+                if (isNavigationModeActive) setNavigationMode(false);
+                triggerHaptic([100, 50, 100]);
+                speak("Stopped. Standing by.");
+                guidanceTextEl.innerText = "Stopped. Standing by.";
+                intentBadge.innerText = "Standby";
+                return;
+            }
+
+            // 2. Navigation Mode On/Off locally (0ms latency)
             if (t.includes('help me navigate') || t.includes('start navigation') || t.includes('navigation mode') || t.includes('start auto scan')) {
                 setNavigationMode(true);
                 speak("Navigation mode activated. Continuously scanning your path every 3 seconds.");
@@ -1679,12 +1725,6 @@ Return answer in clean JSON:
                 speak("Navigation mode deactivated. Auto-scan stopped.");
                 guidanceTextEl.innerText = "Navigation mode deactivated. Standing by.";
                 intentBadge.innerText = "Standby";
-                return;
-            }
-
-            // 2. Stop / Cancel Target Search (0ms latency)
-            if (t.includes('stop finding') || t.includes('cancel search') || t.includes('found it') || t.includes('stop tracking') || t.includes('exit target')) {
-                cancelTargetTracking();
                 return;
             }
 
