@@ -997,7 +997,7 @@
         refreshEngineUi();
 
         // ==========================================
-        // 2. ALWAYS-ON CAMERA CONTROLS
+        // 2. ALWAYS-ON HIGH-DEFINITION CAMERA CONTROLS
         // ==========================================
         async function startCamera(facingMode = "environment") {
             try {
@@ -1005,11 +1005,13 @@
                     webcamStream.getTracks().forEach(t => t.stop());
                 }
 
+                // Request high-resolution sensor feed with continuous autofocus & exposure
                 const constraints = {
                     video: {
                         facingMode: { ideal: facingMode },
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
+                        width: { ideal: 1920, min: 1280 },
+                        height: { ideal: 1080, min: 720 },
+                        frameRate: { ideal: 30, min: 15 }
                     },
                     audio: false
                 };
@@ -1021,7 +1023,21 @@
                 noCamPlaceholder.style.display = "none";
 
                 trackRef = webcamStream.getVideoTracks()[0];
-                const capabilities = trackRef.getCapabilities ? trackRef.getCapabilities() : {};
+
+                // Attempt to apply hardware continuous autofocus if supported
+                if (trackRef && trackRef.applyConstraints) {
+                    try {
+                        await trackRef.applyConstraints({
+                            advanced: [
+                                { focusMode: "continuous" },
+                                { exposureMode: "continuous" },
+                                { whiteBalanceMode: "continuous" }
+                            ]
+                        });
+                    } catch (e) {}
+                }
+
+                const capabilities = trackRef && trackRef.getCapabilities ? trackRef.getCapabilities() : {};
                 if (capabilities.torch) {
                     document.getElementById('btnTorch').style.display = "inline-flex";
                     hasTorch = true;
@@ -1441,7 +1457,7 @@
         if (SpeechRec) {
             speechRecognition = new SpeechRec();
             speechRecognition.continuous = true;
-            speechRecognition.interimResults = false;
+            speechRecognition.interimResults = true;
             speechRecognition.lang = 'en-US';
 
             speechRecognition.onspeechstart = () => {
@@ -1462,29 +1478,31 @@
             speechRecognition.onresult = (e) => {
                 const results = e.results;
                 const latestResult = results[results.length - 1];
+                const rawTranscript = latestResult[0].transcript.trim();
+                const t = rawTranscript.toLowerCase();
+
+                // Ultra-Fast Stop Check on ANY utterance (interim or final)
+                const STOP_PHRASES = ['stop', 'cancel', 'halt', 'quit', 'exit', 'shut up', 'quiet', 'silence', 'pause', 'hush', 'found it', 'stop it', 'stop finding', 'stop tracking', 'stop navigation', 'enough'];
+                const isStopTriggered = STOP_PHRASES.some(w => t === w || t.startsWith(w + ' ') || t.endsWith(' ' + w) || t.includes('stop'));
+
+                if (isStopTriggered) {
+                    window.speechSynthesis.cancel();
+                    cancelTargetTracking();
+                    if (isNavigationModeActive) setNavigationMode(false);
+                    triggerHaptic([100, 50, 100]);
+                    speak("Stopped. Standing by.");
+                    return;
+                }
+
                 if (latestResult.isFinal) {
-                    const rawTranscript = latestResult[0].transcript.trim();
-                    const t = rawTranscript.toLowerCase();
-
-                    // CRITICAL: Highest priority STOP & INTERRUPT listener
-                    const STOP_PHRASES = ['stop', 'cancel', 'halt', 'quit', 'exit', 'shut up', 'quiet', 'silence', 'pause', 'hush', 'found it', 'stop it', 'stop finding', 'stop tracking', 'stop navigation', 'enough'];
-                    const isStopTriggered = STOP_PHRASES.some(w => t === w || t.startsWith(w + ' ') || t.endsWith(' ' + w) || t.includes('stop'));
-
-                    if (isStopTriggered) {
-                        window.speechSynthesis.cancel();
-                        cancelTargetTracking();
-                        if (isNavigationModeActive) setNavigationMode(false);
-                        triggerHaptic([100, 50, 100]);
-                        speak("Stopped. Standing by.");
-                        return;
-                    }
-
                     if (rawTranscript.length > 1) {
                         textInput.value = rawTranscript;
                         micStatus.innerText = `Heard: "${rawTranscript}"`;
                         triggerHaptic([40, 30]);
                         executeAssist(rawTranscript);
                     }
+                } else {
+                    micStatus.innerText = `Listening: "${rawTranscript}..."`;
                 }
             };
 
@@ -1533,24 +1551,25 @@
         });
 
         // ==========================================
-        // 8. GOOGLE GEMINI FLASH MULTIMODAL VISION ENGINE (OPTIMIZED)
+        // 8. GOOGLE GEMINI FLASH MULTIMODAL VISION ENGINE (HIGH PRECISION)
         // ==========================================
         async function runGeminiVisionPipeline(queryText, imageBase64) {
             const rawBase64 = imageBase64 ? imageBase64.replace(/^data:image\/[a-z]+;base64,/, '') : "";
             
             const prompt = `You are VisionAssist AI accessibility companion for visually impaired navigation.
 User query: "${queryText}".
+Inspect the high-resolution camera view thoroughly.
+Identify any objects mentioned (e.g. charger, phone, keys, bottle, door, chair, cable, medicine).
 Give immediate, concise, direct spoken advice in 1 short sentence.
-- If asking about path / walking safety: state if path is clear or describe obstacles directly in walking path.
-- If finding an object: specify its location (e.g. "on the table slightly to your right, 1.5m away").
-- If reading text/medicine: read exact text.
 Return answer in clean JSON:
 {
   "intent": "hazard_check",
-  "spoken_response": "Short actionable spoken response",
+  "spoken_response": "Short actionable spoken response to read aloud to user",
   "path_clear": true,
-  "primary_hazard": null,
-  "target_found": true
+  "target_found": true,
+  "detected_objects": [
+    { "label": "charger", "box_2d": [400, 500, 600, 750], "distance_m": 0.8, "position": "on the table slightly to your right" }
+  ]
 }`;
 
             const parts = [{ text: prompt }];
@@ -1578,7 +1597,7 @@ Return answer in clean JSON:
                             contents: [{ parts: parts }],
                             generationConfig: {
                                 temperature: 0.1,
-                                maxOutputTokens: 250
+                                maxOutputTokens: 350
                             }
                         })
                     });
@@ -1782,10 +1801,33 @@ Return answer in clean JSON:
                 };
             }
 
-            // Always fuse real-time spatial bounding boxes into raw_data
-            if (!data.raw_data) data.raw_data = {};
-            if (!data.raw_data.all_detections && latestDetections.length > 0) {
-                data.raw_data.all_detections = latestDetections;
+            // If Cloud AI returned specific open-vocabulary detected objects, convert to canvas bounding boxes
+            if (data.raw_data && Array.isArray(data.raw_data.detected_objects) && data.raw_data.detected_objects.length > 0) {
+                const w = videoEl.videoWidth || canvasEl.width || 640;
+                const h = videoEl.videoHeight || canvasEl.height || 480;
+                const geminiBoxes = data.raw_data.detected_objects.map(obj => {
+                    const [ymin, xmin, ymax, xmax] = obj.box_2d || [200, 200, 600, 600];
+                    return {
+                        class: obj.label || "target",
+                        score: 95,
+                        bbox: [
+                            Math.round((xmin / 1000) * w),
+                            Math.round((ymin / 1000) * h),
+                            Math.round((xmax / 1000) * w),
+                            Math.round((ymax / 1000) * h)
+                        ],
+                        distance_m: obj.distance_m ? obj.distance_m.toString() : "0.9",
+                        position: obj.position || "in front of you",
+                        is_obstacle: false
+                    };
+                });
+                latestDetections = geminiBoxes;
+                data.raw_data.all_detections = geminiBoxes;
+            } else {
+                if (!data.raw_data) data.raw_data = {};
+                if (!data.raw_data.all_detections && latestDetections.length > 0) {
+                    data.raw_data.all_detections = latestDetections;
+                }
             }
 
             const latency = Math.round(performance.now() - startTime);
