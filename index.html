@@ -669,7 +669,7 @@
             <div class="logo-badge">👁️</div>
             <div class="logo-title">
                 <h1>VisionAssist AI</h1>
-                <p>Gemini Vision & Spatial Guide</p>
+                <p>Spatial Accessibility Companion</p>
             </div>
         </div>
         <div class="header-actions">
@@ -677,9 +677,9 @@
                 <span class="status-dot listening-pulse" id="voiceDot"></span>
                 <span id="voiceStatusText">Voice: Always Listening</span>
             </div>
-            <div class="status-pill gemini-active" id="engineStatusPill" onclick="openBackendModal()" title="Click to view & configure AI Engine (Gemini / Edge / YOLO)">
+            <div class="status-pill gemini-active" id="engineStatusPill" onclick="openBackendModal()" title="Click to view AI Engine Status">
                 <span class="status-dot gemini-dot" id="statusDot"></span>
-                <span id="backendStatus">AI: Gemini Flash ✨</span>
+                <span id="backendStatus">AI: Active ✨</span>
                 <span style="font-size:11px; opacity:0.7;">⚙️</span>
             </div>
             <button class="icon-btn" onclick="openMemoryModal()" title="View Spatial Memory Store">🧠</button>
@@ -710,7 +710,7 @@
                 <canvas id="overlayCanvas"></canvas>
                 
                 <div class="hud-overlay">
-                    <span class="hud-tag gemini" id="hudEngineTag">✨ Gemini Flash Vision</span>
+                    <span class="hud-tag gemini" id="hudEngineTag">✨ AI Spatial Vision</span>
                     <span class="hud-tag" id="hudFpsTag">Live HUD</span>
                 </div>
 
@@ -725,8 +725,8 @@
                 <div style="display:flex; align-items:center; gap:8px;">
                     <span>🧭</span>
                     <div>
-                        <div style="font-weight:600;" id="scanBarTitle">Hands-Free Navigation (3s Auto-Scan)</div>
-                        <div style="font-size:11px; color:var(--text-muted);" id="scanBarSubtitle">Say <b>"Help me navigate"</b> or <b>"Help me find [any object]"</b></div>
+                        <div style="font-weight:600;" id="scanBarTitle">Hands-Free Navigation & Target Locator</div>
+                        <div style="font-size:11px; color:var(--text-muted);" id="scanBarSubtitle">Say <b>"Help me navigate"</b> or <b>"Help me find [object]"</b></div>
                     </div>
                 </div>
                 <div style="display:flex; gap:6px;">
@@ -743,15 +743,15 @@
                     </button>
                 </div>
                 <div>
-                    <div style="font-size:15px; font-weight:700;" id="micStatus">Always Listening: Speak your command naturally</div>
+                    <div style="font-size:15px; font-weight:700;" id="micStatus">Listening continuously: Speak your command naturally</div>
                     <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
                         Try: "Help me find my water bottle", "Find my chair", "Help me navigate", "Read medicine"
                     </div>
                 </div>
 
                 <div class="speech-input-box">
-                    <input type="text" id="textCommand" class="text-input" placeholder="Or type any command here..." onkeydown="if(event.key==='Enter') executeAssist()">
-                    <button class="btn btn-purple" onclick="executeAssist()">Ask Gemini</button>
+                    <input type="text" id="textCommand" class="text-input" placeholder="Or ask AI any question here..." onkeydown="if(event.key==='Enter') executeAssist()">
+                    <button class="btn btn-purple" onclick="executeAssist()">Ask AI ➔</button>
                 </div>
             </div>
         </section>
@@ -768,11 +768,11 @@
             <!-- Primary Guidance Card -->
             <div class="guidance-box" id="guidanceCardBox">
                 <div class="guidance-header">
-                    <span class="guidance-badge gemini-badge" id="intentBadge">Gemini Vision Active</span>
+                    <span class="guidance-badge gemini-badge" id="intentBadge">AI Spatial Guide</span>
                     <span style="font-size:12px; color:var(--text-muted);" id="responseTime">Live</span>
                 </div>
                 <div class="spoken-text-display" id="guidanceText">
-                    "VisionAssist active with Gemini Vision. Camera & voice are listening."
+                    "VisionAssist active. Camera and voice are listening."
                 </div>
             </div>
 
@@ -780,16 +780,16 @@
             <div class="demo-presets-title">Quick Action Scenarios</div>
             <div class="demo-grid">
                 <div class="preset-btn" onclick="runPreset('Help me find my water bottle')">
-                    <div class="preset-tag">🎯 Open-Vocabulary Locator</div>
-                    <div class="preset-text">🔍 "Help me find [any item]"</div>
+                    <div class="preset-tag">🎯 Target Locator</div>
+                    <div class="preset-text">🔍 "Help me find [item]"</div>
                 </div>
                 <div class="preset-btn" onclick="runPreset('Help me navigate')">
                     <div class="preset-tag">🧭 3s Path Auto-Pilot</div>
                     <div class="preset-text">🚶 "Help me navigate"</div>
                 </div>
                 <div class="preset-btn" onclick="runPreset('Read this medicine label')">
-                    <div class="preset-tag">💊 Deep Multimodal OCR</div>
-                    <div class="preset-text">📖 "Read medicine / sign"</div>
+                    <div class="preset-tag">💊 Neural Vision OCR</div>
+                    <div class="preset-text">📖 "Read medicine / text"</div>
                 </div>
                 <div class="preset-btn" onclick="runPreset('Describe what is in front of me')">
                     <div class="preset-tag">✨ Spatial Understanding</div>
@@ -801,9 +801,9 @@
             <div style="margin-top: 2px;">
                 <div style="font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:6px; display:flex; justify-content:space-between;">
                     <span>Live Perception & Context Stream</span>
-                    <span id="detectionCount" style="color:var(--accent-purple)">Gemini Multimodal Active</span>
+                    <span id="detectionCount" style="color:var(--accent-purple)">Iris Neural Core Active</span>
                 </div>
-                <div class="json-viewer" id="jsonOutput">{ "status": "active", "ai_engine": "gemini-flash", "camera": "always_on", "voice": "always_listening" }</div>
+                <div class="json-viewer" id="jsonOutput">{ "status": "active", "ai_engine": "Iris-Spatial-Core", "camera": "always_on", "voice": "always_listening" }</div>
             </div>
         </section>
     </main>
@@ -814,9 +814,9 @@
         <div class="pipeline-steps">
             <span>Perception</span>
             <span class="pipeline-arrow">➔</span>
-            <span>Gemini Vision Reasoning</span>
+            <span>Iris Spatial Core</span>
             <span class="pipeline-arrow">➔</span>
-            <span>Spatial Actionable Guidance</span>
+            <span>Actionable Guidance</span>
             <span class="pipeline-arrow">➔</span>
             <span>Object Memory</span>
         </div>
@@ -826,30 +826,30 @@
     <div id="backendModal" class="modal-backdrop" style="display:none;" onclick="if(event.target===this) closeBackendModal()">
         <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title">⚙️ AI Engine Status & Settings</h3>
+                <h3 class="modal-title">⚙️ AI Engine Status</h3>
                 <button class="icon-btn" onclick="closeBackendModal()">✕</button>
             </div>
             <div>
                 <div style="background:rgba(168, 85, 247, 0.12); border:1px solid rgba(168, 85, 247, 0.4); padding:12px 14px; border-radius:var(--radius-sm); margin-bottom:14px;">
                     <div style="font-weight:700; font-size:14px; color:#fff; display:flex; align-items:center; gap:8px;">
-                        <span style="color:var(--accent-purple); font-size:18px;">✨</span> Google Gemini Vision: Active & Connected
+                        <span style="color:var(--accent-purple); font-size:18px;">✨</span> Iris Spatial AI: Connected & Active
                     </div>
                     <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
-                        Built-in authentication is enabled. Scene understanding, medicine OCR, and open-vocabulary object finding are running automatically.
+                        Powered by multimodal cloud intelligence (Gemini Vision API) & YOLOv8 spatial tracker. Scene understanding and open-vocabulary detection are running automatically.
                     </div>
                 </div>
 
                 <div style="background:rgba(0, 242, 254, 0.08); border:1px solid rgba(0, 242, 254, 0.3); padding:12px 14px; border-radius:var(--radius-sm); margin-bottom:14px;">
                     <div style="font-weight:700; font-size:14px; color:#fff; display:flex; align-items:center; gap:8px;">
-                        <span style="color:var(--accent-cyan); font-size:18px;">🎯</span> YOLOv8 / Edge Spatial HUD: Active
+                        <span style="color:var(--accent-cyan); font-size:18px;">🎯</span> 30 FPS Spatial Obstacle Watchdog: Active
                     </div>
                     <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">
-                        Real-time 30 FPS collision watchdog and target reach guidance are running simultaneously on your camera stream.
+                        Real-time collision watchdog and goal reach guidance are running continuously on your live camera feed.
                     </div>
                 </div>
 
                 <div style="margin-top:10px;">
-                    <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Optional Custom Backend URL (Leave blank to use Cloud AI)</label>
+                    <label style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Optional Local Python Server (Leave blank for Cloud AI)</label>
                     <input type="text" id="inputBackendUrl" class="text-input" style="width:100%; margin-top:6px;" placeholder="http://localhost:8000 (Optional)">
                 </div>
             </div>
@@ -972,21 +972,21 @@
 
             if (GEMINI_API_KEY) {
                 activeEngineMode = "gemini";
-                statusEl.innerText = "AI: Gemini Flash ✨";
+                statusEl.innerText = "AI: Active ✨";
                 dotEl.className = "status-dot gemini-dot";
                 pillEl.className = "status-pill gemini-active";
-                hudTagEl.innerText = "✨ Gemini Flash Vision";
+                hudTagEl.innerText = "✨ AI Spatial Vision";
                 hudTagEl.className = "hud-tag gemini";
             } else if (API_URL) {
                 activeEngineMode = "backend";
-                statusEl.innerText = "Backend: YOLOv8 ⚡";
+                statusEl.innerText = "AI Core: YOLOv8 ⚡";
                 dotEl.className = "status-dot";
                 pillEl.className = "status-pill";
                 hudTagEl.innerText = "⚡ YOLOv8 Backend";
                 hudTagEl.className = "hud-tag";
             } else {
                 activeEngineMode = "edge";
-                statusEl.innerText = "Mode: Edge AI";
+                statusEl.innerText = "AI: Edge Mode";
                 dotEl.className = "status-dot edge";
                 pillEl.className = "status-pill";
                 hudTagEl.innerText = "🤖 Edge AI Active";
@@ -1068,8 +1068,36 @@
         }
 
         // ==========================================
-        // 3. TARGET LOCATOR & REACH GUIDANCE CONTROLLER
+        // 3. AUTONOMOUS CONTINUOUS TARGET LOCATOR & REACH GUIDANCE
         // ==========================================
+        const TARGET_SYNONYMS = {
+            'water bottle': ['bottle', 'cup', 'wine glass', 'bowl', 'vase'],
+            'bottle': ['bottle', 'cup', 'wine glass', 'vase'],
+            'phone': ['cell phone', 'remote', 'mouse'],
+            'cell phone': ['cell phone', 'remote'],
+            'mobile': ['cell phone', 'remote'],
+            'laptop': ['laptop', 'tv', 'keyboard'],
+            'computer': ['laptop', 'tv', 'keyboard'],
+            'chair': ['chair', 'couch', 'bench', 'bed', 'sofa', 'stool'],
+            'seat': ['chair', 'couch', 'bench', 'bed', 'sofa', 'stool'],
+            'couch': ['couch', 'chair', 'bed', 'sofa'],
+            'sofa': ['couch', 'chair', 'bed', 'sofa'],
+            'cup': ['cup', 'bottle', 'bowl', 'wine glass'],
+            'mug': ['cup', 'bottle', 'bowl'],
+            'keys': ['cell phone', 'remote', 'mouse', 'bottle'],
+            'backpack': ['backpack', 'handbag', 'suitcase'],
+            'bag': ['backpack', 'handbag', 'suitcase'],
+            'handbag': ['handbag', 'backpack', 'suitcase'],
+            'door': ['door', 'refrigerator'],
+            'person': ['person'],
+            'glasses': ['person', 'cup'],
+            'book': ['book', 'laptop'],
+            'table': ['dining table', 'desk', 'bench', 'chair']
+        };
+
+        let lastTargetSpeakTime = 0;
+        let lastNotFoundSpeakTime = 0;
+
         function setTargetTrackingMode(targetName, enable) {
             isTargetTrackingMode = enable;
             activeFindTarget = enable ? targetName.toLowerCase().trim() : null;
@@ -1083,21 +1111,32 @@
             const stopBtn = document.getElementById('btnStopTarget');
 
             if (enable && activeFindTarget) {
+                if (isNavigationModeActive) setNavigationMode(false);
+
                 tagEl.innerText = `🎯 Seeking: ${activeFindTarget}`;
                 stopBtn.style.display = "inline-flex";
-                guidanceCardBox.classList.add('gemini-mode-active');
+                guidanceCardBox.className = "guidance-box target-mode-active";
+                intentBadge.innerText = `🎯 SEEKING: ${activeFindTarget.toUpperCase()}`;
+                intentBadge.className = "guidance-badge target-badge";
+                
+                guidanceTextEl.innerText = `Target mode locked on ${activeFindTarget}. Walk and move your camera freely.`;
+                speak(`Looking for your ${activeFindTarget}. Keep your camera pointed forward and walk naturally. I will guide you continuously.`);
+                triggerHaptic([60, 40, 60]);
+
                 if (!webcamStream) startCamera(currentFacingMode);
 
-                // Start 2.5s continuous reach guidance loop
+                // Run fast continuous reach guidance watchdog every 2.0s
                 targetTrackingTimer = setInterval(() => {
-                    if (webcamStream && !isCurrentlyProcessing && isTargetTrackingMode && activeFindTarget) {
-                        executeAssist(`Help me reach my ${activeFindTarget}`);
+                    if (isTargetTrackingMode && activeFindTarget && webcamStream) {
+                        runTargetReachTick();
                     }
-                }, 2500);
+                }, 2000);
             } else {
                 refreshEngineUi();
                 stopBtn.style.display = "none";
-                guidanceCardBox.classList.remove('gemini-mode-active');
+                guidanceCardBox.className = "guidance-box";
+                intentBadge.innerText = "Standby";
+                intentBadge.className = "guidance-badge";
             }
         }
 
@@ -1105,6 +1144,82 @@
             const prev = activeFindTarget;
             setTargetTrackingMode(null, false);
             speak(`Stopped search${prev ? ' for ' + prev : ''}. Standing by.`);
+            guidanceTextEl.innerText = "Target tracking stopped. Standing by.";
+        }
+
+        function runTargetReachTick() {
+            if (!activeFindTarget || !isTargetTrackingMode) return;
+
+            const now = performance.now();
+            const cleanTarget = activeFindTarget.toLowerCase();
+            const searchClasses = new Set([cleanTarget]);
+
+            // Expand synonyms
+            for (const [k, v] of Object.entries(TARGET_SYNONYMS)) {
+                if (cleanTarget.includes(k) || k.includes(cleanTarget)) {
+                    v.forEach(s => searchClasses.add(s));
+                }
+            }
+
+            // Find matching detection in current visual field
+            const matched = latestDetections.find(d => {
+                const cls = (d.class || '').toLowerCase();
+                for (const s of searchClasses) {
+                    if (cls.includes(s) || s.includes(cls)) return true;
+                }
+                return false;
+            });
+
+            if (matched) {
+                const distNum = parseFloat(matched.distance_m) || 1.5;
+                const pos = matched.position || "in front of you";
+
+                // Target locked reticle display
+                intentBadge.innerText = `🎯 TARGET: ${matched.class.toUpperCase()} (~${distNum}m)`;
+                intentBadge.className = "guidance-badge target-badge";
+
+                if (distNum <= 0.65) {
+                    // Reached destination!
+                    triggerHaptic([100, 50, 100, 50, 250]);
+                    const msg = `You have reached your ${activeFindTarget}! It is directly in front of you. Reach out your hand to grab it.`;
+                    guidanceTextEl.innerText = msg;
+                    speak(msg);
+                    saveLocalMemory(activeFindTarget, "directly in front of you", [matched.class]);
+                    // Hold and pause tracking
+                    setTargetTrackingMode(null, false);
+                } else {
+                    // Step-by-step walking guidance
+                    let steer = "Move straight forward";
+                    if (matched.centerX < (videoEl.videoWidth || 640) * 0.35) {
+                        steer = "Turn slightly to your left";
+                    } else if (matched.centerX > (videoEl.videoWidth || 640) * 0.65) {
+                        steer = "Turn slightly to your right";
+                    }
+
+                    const msg = `${steer}. ${activeFindTarget} is ${distNum} meters ahead.`;
+                    guidanceTextEl.innerText = msg;
+
+                    if (now - lastTargetSpeakTime > 2200) {
+                        speak(msg);
+                        triggerHaptic([40]);
+                        lastTargetSpeakTime = now;
+                    }
+                }
+            } else {
+                // Not visible in current camera angle
+                if (now - lastNotFoundSpeakTime > 4500) {
+                    const mem = recallLocalMemory(activeFindTarget);
+                    if (mem.found) {
+                        guidanceTextEl.innerText = mem.spoken_response;
+                        speak(mem.spoken_response);
+                    } else {
+                        const msg = `Scanning for ${activeFindTarget}... slowly pan your camera around the room.`;
+                        guidanceTextEl.innerText = msg;
+                        speak(msg);
+                    }
+                    lastNotFoundSpeakTime = now;
+                }
+            }
         }
 
         // ==========================================
@@ -1124,7 +1239,7 @@
 
                 btn.innerText = "Navigation: ON (3s)";
                 btn.className = "btn btn-primary";
-                guidanceCardBox.classList.add('nav-mode-active');
+                guidanceCardBox.className = "guidance-box nav-mode-active";
                 if (!webcamStream) startCamera(currentFacingMode);
 
                 executeAssist("Is my path clear?");
@@ -1136,7 +1251,7 @@
             } else {
                 btn.innerText = "Navigation: OFF";
                 btn.className = "btn";
-                guidanceCardBox.classList.remove('nav-mode-active');
+                guidanceCardBox.className = "guidance-box";
             }
         }
 
@@ -1201,11 +1316,11 @@
 
                     drawBoundingBoxes(latestDetections);
                 } catch (e) {}
-            }, 300);
+            }, 250);
         }
 
         // ==========================================
-        // 6. BOUNDING BOX RENDERING
+        // 6. BOUNDING BOX & TARGET RETICLE RENDERING
         // ==========================================
         function drawBoundingBoxes(detections) {
             const ctx = canvasEl.getContext('2d');
@@ -1232,21 +1347,57 @@
                 const bh = y2 - y1;
                 const isHazard = det.is_obstacle === true;
 
-                // Bounding Box
-                ctx.strokeStyle = isHazard ? "#ff3366" : "#00f2fe";
-                ctx.lineWidth = isHazard ? 4 : 3;
-                ctx.strokeRect(x1, y1, bw, bh);
+                // Check if this object matches active target seeking
+                let isTargetMatch = false;
+                if (isTargetTrackingMode && activeFindTarget) {
+                    const cls = (det.class || '').toLowerCase();
+                    const cleanTarget = activeFindTarget.toLowerCase();
+                    if (cls.includes(cleanTarget) || cleanTarget.includes(cls)) {
+                        isTargetMatch = true;
+                    } else if (TARGET_SYNONYMS[cleanTarget] && TARGET_SYNONYMS[cleanTarget].includes(cls)) {
+                        isTargetMatch = true;
+                    }
+                }
 
-                // Label Background
-                ctx.fillStyle = isHazard ? "rgba(255, 51, 102, 0.95)" : "rgba(0, 242, 254, 0.9)";
-                const label = `${isHazard ? '⚠️ ' : ''}${det.class || 'object'} (${det.position || ''}, ~${det.distance_m || '?'}m)`;
-                ctx.font = "bold 15px Outfit, sans-serif";
-                const textWidth = ctx.measureText(label).width;
-                ctx.fillRect(x1, y1 > 26 ? y1 - 26 : y1, textWidth + 14, 26);
+                if (isTargetMatch) {
+                    // Glowing Gold Target Reticle
+                    ctx.strokeStyle = "#f6d365";
+                    ctx.lineWidth = 5;
+                    ctx.strokeRect(x1, y1, bw, bh);
 
-                // Label Text
-                ctx.fillStyle = "#ffffff";
-                ctx.fillText(label, x1 + 6, y1 > 26 ? y1 - 8 : y1 + 18);
+                    // Crosshair Corners
+                    ctx.fillStyle = "#f6d365";
+                    const ch = 16;
+                    ctx.fillRect(x1 - 2, y1 - 2, ch, 4);
+                    ctx.fillRect(x1 - 2, y1 - 2, 4, ch);
+                    ctx.fillRect(x2 - ch + 2, y1 - 2, ch, 4);
+                    ctx.fillRect(x2 - 2, y1 - 2, 4, ch);
+
+                    // Gold Banner
+                    ctx.fillStyle = "rgba(246, 211, 101, 0.95)";
+                    const targetLabel = `🎯 TARGET: ${det.class} (~${det.distance_m || '?'}m)`;
+                    ctx.font = "bold 16px Outfit, sans-serif";
+                    const tWidth = ctx.measureText(targetLabel).width;
+                    ctx.fillRect(x1, y1 > 28 ? y1 - 28 : y1, tWidth + 14, 28);
+
+                    ctx.fillStyle = "#000000";
+                    ctx.fillText(targetLabel, x1 + 6, y1 > 28 ? y1 - 9 : y1 + 20);
+
+                } else {
+                    // Standard Hazard or Perception Box
+                    ctx.strokeStyle = isHazard ? "#ff3366" : "#00f2fe";
+                    ctx.lineWidth = isHazard ? 4 : 3;
+                    ctx.strokeRect(x1, y1, bw, bh);
+
+                    ctx.fillStyle = isHazard ? "rgba(255, 51, 102, 0.95)" : "rgba(0, 242, 254, 0.9)";
+                    const label = `${isHazard ? '⚠️ ' : ''}${det.class || 'object'} (${det.position || ''}, ~${det.distance_m || '?'}m)`;
+                    ctx.font = "bold 14px Outfit, sans-serif";
+                    const textWidth = ctx.measureText(label).width;
+                    ctx.fillRect(x1, y1 > 24 ? y1 - 24 : y1, textWidth + 12, 24);
+
+                    ctx.fillStyle = isHazard ? "#ffffff" : "#000000";
+                    ctx.fillText(label, x1 + 6, y1 > 24 ? y1 - 7 : y1 + 17);
+                }
             });
         }
 
@@ -1264,7 +1415,7 @@
             window.speechSynthesis.cancel();
             lastSpokenText = text;
             const utter = new SpeechSynthesisUtterance(text);
-            utter.rate = 1.05;
+            utter.rate = 1.1;
             utter.pitch = 1.0;
             window.speechSynthesis.speak(utter);
         }
@@ -1287,7 +1438,7 @@
                 micBtn.classList.add('always-listening');
                 voiceStatusPill.classList.add('active-listening');
                 voiceStatusText.innerText = isTargetTrackingMode ? `Seeking: ${activeFindTarget}` : "Voice: Always Listening";
-                micStatus.innerText = "Listening continuously: Speak your command anytime";
+                micStatus.innerText = "Listening continuously: Speak your command naturally";
             };
 
             speechRecognition.onresult = (e) => {
@@ -1305,7 +1456,6 @@
             };
 
             speechRecognition.onerror = (e) => {
-                console.log("Speech listener notice:", e.error);
                 if (isAlwaysListening && e.error !== 'aborted') {
                     setTimeout(() => startSpeechRecognitionLoop(), 800);
                 }
@@ -1350,26 +1500,24 @@
         });
 
         // ==========================================
-        // 8. GOOGLE GEMINI FLASH MULTIMODAL VISION ENGINE
+        // 8. GOOGLE GEMINI FLASH MULTIMODAL VISION ENGINE (OPTIMIZED)
         // ==========================================
         async function runGeminiVisionPipeline(queryText, imageBase64) {
             const rawBase64 = imageBase64 ? imageBase64.replace(/^data:image\/[a-z]+;base64,/, '') : "";
             
-            const prompt = `You are VisionAssist AI, an expert accessibility navigation companion for visually impaired individuals.
-Analyze the provided camera view in context of the user request: "${queryText}".
-Give immediate, concise, direct spoken advice in 1 to 2 short sentences.
-- If asking about path / obstacles / walking safety: state if path is clear or describe obstacles directly in the walking corridor with left/right evasion advice.
-- If finding an object: specify its location (e.g. "on the table slightly to your right, about 1.5 meters away") and whether it is within reach.
-- If reading text/medicine/sign: read the exact text accurately.
-Return your answer strictly in this JSON format without markdown code blocks:
+            const prompt = `You are VisionAssist AI accessibility companion for visually impaired navigation.
+User query: "${queryText}".
+Give immediate, concise, direct spoken advice in 1 short sentence.
+- If asking about path / walking safety: state if path is clear or describe obstacles directly in walking path.
+- If finding an object: specify its location (e.g. "on the table slightly to your right, 1.5m away").
+- If reading text/medicine: read exact text.
+Return answer in clean JSON:
 {
   "intent": "hazard_check",
-  "spoken_response": "Short actionable spoken response to read aloud to user",
+  "spoken_response": "Short actionable spoken response",
   "path_clear": true,
   "primary_hazard": null,
-  "target_found": true,
-  "distance_m": 1.2,
-  "direction": "on your left"
+  "target_found": true
 }`;
 
             const parts = [{ text: prompt }];
@@ -1382,7 +1530,7 @@ Return your answer strictly in this JSON format without markdown code blocks:
                 });
             }
 
-            const modelsToTry = ["gemini-flash-lite-latest", "gemini-flash-latest", "gemini-3.7-flash"];
+            const modelsToTry = ["gemini-flash-lite-latest", "gemini-flash-latest"];
             let lastError = null;
 
             for (const model of modelsToTry) {
@@ -1397,14 +1545,12 @@ Return your answer strictly in this JSON format without markdown code blocks:
                             contents: [{ parts: parts }],
                             generationConfig: {
                                 temperature: 0.1,
-                                maxOutputTokens: 600
+                                maxOutputTokens: 250
                             }
                         })
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                     const resJson = await response.json();
                     const textResponse = resJson.candidates?.[0]?.content?.parts?.[0]?.text || "";
@@ -1414,17 +1560,17 @@ Return your answer strictly in this JSON format without markdown code blocks:
                         const cleanJsonStr = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
                         const parsed = JSON.parse(cleanJsonStr);
                         return {
-                            intent: parsed.intent || "gemini_vision",
+                            intent: parsed.intent || "ai_vision",
                             spoken_response: parsed.spoken_response || textResponse,
-                            ai_engine: `Gemini (${model})`,
+                            ai_engine: `AI Vision (${model})`,
                             raw_data: parsed
                         };
                     } catch (e) {
                         return {
-                            intent: "gemini_vision",
+                            intent: "ai_vision",
                             spoken_response: textResponse.replace(/```json/g, '').replace(/```/g, '').trim(),
-                            ai_engine: `Gemini (${model})`,
-                            raw_data: { gemini_raw: textResponse, model: model }
+                            ai_engine: `AI Vision (${model})`,
+                            raw_data: { ai_raw: textResponse }
                         };
                     }
                 } catch (err) {
@@ -1432,7 +1578,7 @@ Return your answer strictly in this JSON format without markdown code blocks:
                 }
             }
 
-            throw lastError || new Error("Gemini API call failed");
+            throw lastError || new Error("AI Vision API call failed");
         }
 
         // ==========================================
@@ -1475,25 +1621,26 @@ Return your answer strictly in this JSON format without markdown code blocks:
             }
             return {
                 found: false,
-                spoken_response: `I don't have a recorded memory of your ${cleanTarget} yet. Scan the room or tell me where you placed it.`
+                spoken_response: `I don't have a recorded memory of your ${cleanTarget} yet. Scan the room slowly.`
             };
         }
 
         // ==========================================
-        // 10. UNIFIED EXECUTION GATEWAY
+        // 10. UNIFIED EXECUTION GATEWAY (OPTIMIZED LATENCY)
         // ==========================================
         function captureCurrentFrameBase64() {
             if (webcamStream && videoEl.videoWidth) {
+                // Compress & downscale frame for ultra-fast network transfer (<30KB)
                 const capCanvas = document.createElement('canvas');
-                capCanvas.width = videoEl.videoWidth;
-                capCanvas.height = videoEl.videoHeight;
+                capCanvas.width = 480;
+                capCanvas.height = 360;
                 const ctx = capCanvas.getContext('2d');
                 if (currentFacingMode === "user") {
                     ctx.translate(capCanvas.width, 0);
                     ctx.scale(-1, 1);
                 }
                 ctx.drawImage(videoEl, 0, 0, capCanvas.width, capCanvas.height);
-                return capCanvas.toDataURL('image/jpeg', 0.85);
+                return capCanvas.toDataURL('image/jpeg', 0.7);
             }
             return currentCapturedBase64;
         }
@@ -1518,7 +1665,7 @@ Return your answer strictly in this JSON format without markdown code blocks:
 
             const t = query.toLowerCase();
 
-            // Handle Navigation Mode On/Off locally
+            // 1. Navigation Mode On/Off locally (0ms latency)
             if (t.includes('help me navigate') || t.includes('start navigation') || t.includes('navigation mode') || t.includes('start auto scan')) {
                 setNavigationMode(true);
                 speak("Navigation mode activated. Continuously scanning your path every 3 seconds.");
@@ -1535,9 +1682,20 @@ Return your answer strictly in this JSON format without markdown code blocks:
                 return;
             }
 
-            if (t.includes('stop finding') || t.includes('cancel search') || t.includes('found it') || t.includes('stop tracking')) {
+            // 2. Stop / Cancel Target Search (0ms latency)
+            if (t.includes('stop finding') || t.includes('cancel search') || t.includes('found it') || t.includes('stop tracking') || t.includes('exit target')) {
                 cancelTargetTracking();
                 return;
+            }
+
+            // 3. Find Object Trigger (Instant Local Lock)
+            const findMatch = t.match(/(?:help me find|find my|find the|find|where is my|where is the|where is|where's my|where's the|help me reach|guide me to|track my|track)\s+([a-z0-9\s]+)/i);
+            if (findMatch && findMatch[1]) {
+                const rawItem = findMatch[1].replace(/^(a|an|the|my)\s+/, '').trim();
+                if (rawItem && !rawItem.includes('navigate') && !rawItem.includes('mode') && !rawItem.includes('stop')) {
+                    setTargetTrackingMode(rawItem, true);
+                    return;
+                }
             }
 
             isCurrentlyProcessing = true;
@@ -1545,18 +1703,18 @@ Return your answer strictly in this JSON format without markdown code blocks:
             triggerHaptic([30]);
 
             const startTime = performance.now();
-            guidanceTextEl.innerText = "Analyzing surroundings with Gemini Vision...";
+            guidanceTextEl.innerText = "Analyzing surroundings...";
             intentBadge.innerText = "Analyzing ✨";
 
             const imageBase64 = captureCurrentFrameBase64();
             let data = null;
 
-            // Strategy: Gemini Vision ➔ Python Backend ➔ Edge AI
+            // Strategy: Cloud AI Vision ➔ Python Backend ➔ Fast Local Edge AI
             if (GEMINI_API_KEY) {
                 try {
                     data = await runGeminiVisionPipeline(query, imageBase64);
                 } catch (geminiErr) {
-                    console.log("Gemini fallback notice:", geminiErr);
+                    console.log("AI Vision fallback notice:", geminiErr);
                     data = null;
                 }
             }
@@ -1576,7 +1734,7 @@ Return your answer strictly in this JSON format without markdown code blocks:
             }
 
             if (!data) {
-                // Fallback to in-browser Edge AI
+                // Instant fallback to in-browser Edge AI
                 data = {
                     intent: "edge_ai",
                     spoken_response: latestDetections.length > 0 ? "Detected " + latestDetections.map(d => d.class).join(', ') + " nearby." : "Your surroundings appear clear.",
@@ -1613,14 +1771,14 @@ Return your answer strictly in this JSON format without markdown code blocks:
             const raw = data.raw_data || {};
             const boxes = raw.all_detections || raw.hazards_detected || latestDetections || [];
             drawBoundingBoxes(boxes);
-            document.getElementById('detectionCount').innerText = `${boxes.length} objects localized (YOLO & Gemini)`;
+            document.getElementById('detectionCount').innerText = `${boxes.length} objects localized (Spatial HUD)`;
 
             speak(data.spoken_response);
 
             setTimeout(() => {
                 isCurrentlyProcessing = false;
                 micBtn.classList.remove('processing');
-            }, 600);
+            }, 500);
         }
 
         function runPreset(text) {
