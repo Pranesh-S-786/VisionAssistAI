@@ -2002,8 +2002,55 @@ Return answer in clean JSON:
                 return;
             }
 
-            // 3. Find Object Trigger (Instant Local Lock)
-            const findMatch = t.match(/(?:help me find|find my|find the|find|where is my|where is the|where is|where's my|where's the|help me reach|guide me to|track my|track)\s+([a-z0-9\s]+)/i);
+            // 3. Explicit "Remember" Location Command (Instant Memory Storage)
+            const rememberMatch = t.match(/(?:remember this is my|remember where my|remember where is my|remember my|remember this|remember location of|save location of|remember)\s+([a-z0-9\s]+)/i);
+            if (rememberMatch && rememberMatch[1]) {
+                const rawItem = rememberMatch[1].replace(/^(a|an|the|my)\s+/, '').trim();
+                if (rawItem && rawItem.length > 1 && !rawItem.includes('navigate') && !rawItem.includes('mode') && !rawItem.includes('stop')) {
+                    isCurrentlyProcessing = true;
+                    micBtn.classList.add('processing');
+                    guidanceTextEl.innerText = `Recording spatial memory for ${rawItem}...`;
+                    intentBadge.innerText = "🧠 Saving Memory";
+                    const imageBase64 = captureCurrentFrameBase64();
+                    let memDesc = "in front of your camera view";
+                    if (GEMINI_API_KEY) {
+                        try {
+                            const aiAnalysis = await runGeminiVisionPipeline(`Where is the ${rawItem} located in this camera view? Describe its exact relative position, surface, and nearby landmarks in 1 concise phrase.`, imageBase64);
+                            if (aiAnalysis && aiAnalysis.spoken_response) {
+                                memDesc = aiAnalysis.spoken_response;
+                            }
+                        } catch(e) {}
+                    }
+                    saveLocalMemory(rawItem, memDesc, [rawItem], "in front of you", "0.8");
+                    const reply = `Remembered! Saved location for ${rawItem}: ${memDesc}`;
+                    guidanceTextEl.innerText = reply;
+                    speak(reply);
+                    triggerHaptic([60, 40, 60]);
+                    isCurrentlyProcessing = false;
+                    micBtn.classList.remove('processing');
+                    return;
+                }
+            }
+
+            // 4. "Where is my [x]" Intelligent Spatial Memory Recall
+            const whereMatch = t.match(/(?:where is my|where did i put my|where did i leave my|where are my|where's my|where is the|where's the|where did i leave)\s+([a-z0-9\s]+)/i);
+            if (whereMatch && whereMatch[1]) {
+                const rawItem = whereMatch[1].replace(/^(a|an|the|my)\s+/, '').trim();
+                const recall = recallLocalMemory(rawItem);
+                if (recall.found) {
+                    guidanceTextEl.innerText = recall.spoken_response;
+                    speak(recall.spoken_response + " Point your camera around and I will guide you.");
+                    intentBadge.innerText = `🧠 Memory: ${rawItem.toUpperCase()}`;
+                    triggerHaptic([80]);
+                    setTimeout(() => {
+                        setTargetTrackingMode(rawItem, true);
+                    }, 2800);
+                    return;
+                }
+            }
+
+            // 5. Find Object Trigger (Instant Local Lock)
+            const findMatch = t.match(/(?:help me find|find my|find the|find|help me reach|guide me to|track my|track)\s+([a-z0-9\s]+)/i);
             if (findMatch && findMatch[1]) {
                 const rawItem = findMatch[1].replace(/^(a|an|the|my)\s+/, '').trim();
                 if (rawItem && !rawItem.includes('navigate') && !rawItem.includes('mode') && !rawItem.includes('stop')) {
@@ -2056,12 +2103,15 @@ Return answer in clean JSON:
                 };
             }
 
-            // If Cloud AI returned specific open-vocabulary detected objects, convert to canvas bounding boxes
+            // If Cloud AI returned specific open-vocabulary detected objects, convert to canvas bounding boxes & update passive memory
             if (data.raw_data && Array.isArray(data.raw_data.detected_objects) && data.raw_data.detected_objects.length > 0) {
                 const w = videoEl.videoWidth || canvasEl.width || 640;
                 const h = videoEl.videoHeight || canvasEl.height || 480;
                 const geminiBoxes = data.raw_data.detected_objects.map(obj => {
                     const [ymin, xmin, ymax, xmax] = obj.box_2d || [200, 200, 600, 600];
+                    if (obj.label && obj.label.length > 2) {
+                        saveLocalMemory(obj.label, `Seen ${obj.position || 'in front'} (~${obj.distance_m || '0.9'}m)`, [obj.label], obj.position || 'in front', obj.distance_m || '0.9', true);
+                    }
                     return {
                         class: obj.label || "target",
                         score: 95,
@@ -2124,8 +2174,149 @@ Return answer in clean JSON:
         }
 
         // ==========================================
-        // 11. SETTINGS MODAL & INITIALIZATION
+        // 11. SPATIAL & SEMANTIC MEMORY ENGINE (HIGH EFFECTIVENESS)
         // ==========================================
+        function getLocalMemory() {
+            try {
+                const stored = localStorage.getItem('visionassist_spatial_memory_v2') || localStorage.getItem('visionassist_memory');
+                return stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveLocalMemory(itemName, locationDesc, contextDetails = [], position = "in front of you", distance_m = "1.0", isPassive = false) {
+            if (!itemName) return null;
+            const cleanName = itemName.toLowerCase().replace(/^(a|an|the|my)\s+/, '').trim();
+            if (cleanName.length < 2 || cleanName === 'navigate' || cleanName === 'stop') return null;
+
+            let mems = getLocalMemory();
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const dateStr = now.toLocaleDateString();
+            const rawTime = Date.now();
+
+            // Filter out old instance of same object name
+            mems = mems.filter(m => m.object_name.toLowerCase() !== cleanName);
+
+            // Construct new spatial memory record
+            const newMem = {
+                id: "mem_" + rawTime,
+                object_name: cleanName,
+                location: locationDesc || ("Positioned " + position + (distance_m ? ` (~${distance_m}m)` : "")),
+                position: position,
+                distance_m: distance_m,
+                context: contextDetails,
+                timestamp: timeStr,
+                date: dateStr,
+                raw_time: rawTime,
+                is_passive: isPassive
+            };
+
+            // Prepend latest memory, keep up to 40 items
+            mems.unshift(newMem);
+            if (mems.length > 40) mems = mems.slice(0, 40);
+
+            try {
+                localStorage.setItem('visionassist_spatial_memory_v2', JSON.stringify(mems));
+                localStorage.setItem('visionassist_memory', JSON.stringify(mems));
+            } catch (e) {}
+
+            return newMem;
+        }
+
+        function recallLocalMemory(queryItem) {
+            if (!queryItem) return { found: false };
+            const cleanQuery = queryItem.toLowerCase().replace(/^(a|an|the|my)\s+/, '').trim();
+            const mems = getLocalMemory();
+
+            const found = mems.find(m => {
+                const name = m.object_name.toLowerCase();
+                return name === cleanQuery || name.includes(cleanQuery) || cleanQuery.includes(name);
+            });
+
+            if (!found) return { found: false };
+
+            // Calculate relative human time ago
+            const minsAgo = Math.max(0, Math.round((Date.now() - found.raw_time) / 60000));
+            let timeAgoStr = "just now";
+            if (minsAgo >= 1440) {
+                const days = Math.floor(minsAgo / 1440);
+                timeAgoStr = `${days} day${days > 1 ? 's' : ''} ago`;
+            } else if (minsAgo >= 60) {
+                const hrs = Math.floor(minsAgo / 60);
+                timeAgoStr = `${hrs} hour${hrs > 1 ? 's' : ''} ago (at ${found.timestamp})`;
+            } else if (minsAgo > 1) {
+                timeAgoStr = `${minsAgo} minutes ago (at ${found.timestamp})`;
+            } else if (minsAgo === 1) {
+                timeAgoStr = `1 minute ago (at ${found.timestamp})`;
+            }
+
+            const spoken = `Your ${found.object_name} was last recorded ${timeAgoStr}, ${found.location}.`;
+            return {
+                found: true,
+                memory: found,
+                time_ago: timeAgoStr,
+                spoken_response: spoken
+            };
+        }
+
+        function deleteLocalMemory(id) {
+            let mems = getLocalMemory().filter(m => m.id !== id);
+            localStorage.setItem('visionassist_spatial_memory_v2', JSON.stringify(mems));
+            localStorage.setItem('visionassist_memory', JSON.stringify(mems));
+            openMemoryModal();
+        }
+
+        function launchTargetFromMemory(itemName) {
+            closeMemoryModal();
+            setTargetTrackingMode(itemName, true);
+        }
+
+        function openMemoryModal() {
+            const listEl = document.getElementById('memoryList');
+            const mems = getLocalMemory();
+            if (mems.length === 0) {
+                listEl.innerHTML = `
+                    <div style="text-align:center; padding:28px 16px; color:var(--text-muted);">
+                        <div style="font-size:36px; margin-bottom:8px;">🧠</div>
+                        <div style="font-weight:700; font-size:15px; color:var(--text-heading);">No spatial memories yet</div>
+                        <div style="font-size:12px; margin-top:4px;">Say <b>"Remember my keys"</b> or scan any object to log locations automatically.</div>
+                    </div>`;
+            } else {
+                listEl.innerHTML = mems.map(m => {
+                    const minsAgo = Math.max(0, Math.round((Date.now() - m.raw_time) / 60000));
+                    let badgeTime = minsAgo === 0 ? "Just now" : (minsAgo < 60 ? `${minsAgo}m ago` : `${Math.floor(minsAgo/60)}h ago`);
+                    return `
+                    <div style="background:var(--bg-subtle); padding:12px 14px; border-radius:10px; border:1px solid var(--teal-border); display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-family:'Syne',sans-serif; font-weight:800; font-size:14.5px; color:var(--teal-deep); text-transform:capitalize;">${m.object_name}</span>
+                                <span style="font-size:10px; font-weight:700; background:rgba(0,76,84,0.08); color:var(--teal-mid); padding:2px 6px; border-radius:12px;">${badgeTime}</span>
+                            </div>
+                            <div style="font-size:12px; color:var(--text-body); margin-top:3px; line-height:1.3;">${m.location}</div>
+                            <div style="font-size:10.5px; color:var(--text-muted); margin-top:2px;">Logged at ${m.timestamp} (${m.date})</div>
+                        </div>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <button class="btn btn-primary" style="padding:5px 10px; font-size:11.5px;" onclick="launchTargetFromMemory('${m.object_name}')" title="Navigate to this object">🔍 Guide</button>
+                            <button class="icon-btn" style="width:30px; height:30px; font-size:13px;" onclick="deleteLocalMemory('${m.id}')" title="Delete memory">🗑️</button>
+                        </div>
+                    </div>
+                `}).join('');
+            }
+            document.getElementById('memoryModal').style.display = "flex";
+        }
+
+        function closeMemoryModal() {
+            document.getElementById('memoryModal').style.display = "none";
+        }
+
+        function clearSpatialMemory() {
+            localStorage.removeItem('visionassist_spatial_memory_v2');
+            localStorage.removeItem('visionassist_memory');
+            openMemoryModal();
+        }
+
         function openBackendModal() {
             const backendInput = document.getElementById('inputBackendUrl');
             if (backendInput) backendInput.value = API_URL;
@@ -2155,32 +2346,6 @@ Return answer in clean JSON:
             closeBackendModal();
             refreshEngineUi();
             speak("Switched to Edge AI Mode.");
-        }
-
-        function openMemoryModal() {
-            const listEl = document.getElementById('memoryList');
-            const mems = getLocalMemory();
-            if (mems.length === 0) {
-                listEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">No spatial memories recorded yet.</div>`;
-            } else {
-                listEl.innerHTML = mems.map(m => `
-                    <div style="background:var(--bg-secondary); padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--border);">
-                        <div style="font-weight:700; font-size:14px; color:var(--accent-cyan); text-transform:capitalize;">${m.object_name}</div>
-                        <div style="font-size:12px; margin-top:2px;">Location: <b>${m.location}</b></div>
-                        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Recorded: ${m.timestamp}</div>
-                    </div>
-                `).join('');
-            }
-            document.getElementById('memoryModal').style.display = "flex";
-        }
-
-        function closeMemoryModal() {
-            document.getElementById('memoryModal').style.display = "none";
-        }
-
-        function clearSpatialMemory() {
-            localStorage.removeItem('visionassist_memory');
-            openMemoryModal();
         }
 
         function toggleHighContrast() {
