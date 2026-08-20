@@ -847,9 +847,10 @@
                     <span class="hud-tag" id="hudFpsTag">Live HUD</span>
                 </div>
 
-                <div id="noCamPlaceholder" style="color:var(--text-muted); text-align:center; padding: 20px; display:none;">
-                    <p style="font-size:44px; margin-bottom:8px;">📷</p>
-                    <p style="font-weight:700; font-size:16px;">Tap to Activate Camera & Voice</p>
+                <div id="noCamPlaceholder" style="position:absolute; top:0; left:0; width:100%; height:100%; display:none; flex-direction:column; align-items:center; justify-content:center; color:#fff; background:rgba(10,34,38,0.85); backdrop-filter:blur(6px); text-align:center; padding:20px; z-index:10; cursor:pointer;" onclick="ensureCameraAndVoice()">
+                    <p style="font-size:48px; margin-bottom:10px;">📷</p>
+                    <p style="font-weight:800; font-size:17px; color:#fff;">Tap to Activate Camera & Voice</p>
+                    <p style="font-size:12px; color:var(--teal-light); margin-top:4px; opacity:0.85;">Click anywhere to start video feed</p>
                 </div>
             </div>
 
@@ -1156,9 +1157,12 @@
         // ==========================================
         async function startCamera(facingMode = "environment") {
             try {
-                // If camera is already active on the same facingMode, DO NOT recreate stream to avoid mobile permission toggle!
+                // If stream is active on requested mode, ensure video is playing and visible
                 if (webcamStream && webcamStream.active && webcamStream.getVideoTracks().some(t => t.readyState === 'live')) {
                     if (currentFacingMode === facingMode) {
+                        videoEl.style.display = "block";
+                        noCamPlaceholder.style.display = "none";
+                        try { await videoEl.play(); } catch(e) {}
                         return;
                     }
                     webcamStream.getTracks().forEach(t => t.stop());
@@ -1166,33 +1170,63 @@
 
                 currentFacingMode = facingMode;
 
-                // Request high-resolution sensor feed with continuous autofocus & exposure
-                const constraints = {
-                    video: {
-                        facingMode: { ideal: facingMode },
-                        width: { ideal: 1920, min: 1280 },
-                        height: { ideal: 1080, min: 720 },
-                        frameRate: { ideal: 30, min: 15 }
+                // Robust tiered constraints: High-res -> Ideal facingMode -> Any video camera
+                let stream = null;
+                const constraintTiers = [
+                    {
+                        video: {
+                            facingMode: { ideal: facingMode },
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        },
+                        audio: false
                     },
-                    audio: false
-                };
+                    {
+                        video: {
+                            facingMode: { ideal: facingMode }
+                        },
+                        audio: false
+                    },
+                    {
+                        video: true,
+                        audio: false
+                    }
+                ];
 
-                webcamStream = await navigator.mediaDevices.getUserMedia(constraints);
+                for (const c of constraintTiers) {
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia(c);
+                        if (stream) break;
+                    } catch (e) {
+                        console.log("Camera constraint tier fallback:", e.name || e.message);
+                    }
+                }
+
+                if (!stream) {
+                    throw new Error("No video stream could be opened from available cameras.");
+                }
+
+                webcamStream = stream;
                 videoEl.srcObject = webcamStream;
                 videoEl.style.display = "block";
                 staticPreview.style.display = "none";
                 noCamPlaceholder.style.display = "none";
 
+                // Explicit play to prevent black paused frame
+                videoEl.onloadedmetadata = () => {
+                    videoEl.play().catch(e => console.log("Video metadata play:", e));
+                };
+                try { await videoEl.play(); } catch (e) {}
+
                 trackRef = webcamStream.getVideoTracks()[0];
 
-                // Attempt to apply hardware continuous autofocus if supported
+                // Continuous autofocus
                 if (trackRef && trackRef.applyConstraints) {
                     try {
                         await trackRef.applyConstraints({
                             advanced: [
                                 { focusMode: "continuous" },
-                                { exposureMode: "continuous" },
-                                { whiteBalanceMode: "continuous" }
+                                { exposureMode: "continuous" }
                             ]
                         });
                     } catch (e) {}
@@ -1216,8 +1250,9 @@
                 startContinuousPerceptionLoop();
 
             } catch (err) {
-                console.log("Camera auto-start notice:", err.message);
-                noCamPlaceholder.style.display = "block";
+                console.warn("Camera start warning:", err.message);
+                videoEl.style.display = "none";
+                noCamPlaceholder.style.display = "flex";
             }
         }
 
@@ -2158,9 +2193,15 @@ Return answer in clean JSON:
             startSpeechRecognitionLoop();
         });
 
-        document.body.addEventListener('click', () => {
-            ensureCameraAndVoice();
-        }, { once: true });
+        // Resume / start camera and voice on any interaction if suspended by browser
+        document.addEventListener('click', () => {
+            if (!webcamStream || !webcamStream.active || !webcamStream.getVideoTracks().some(t => t.readyState === 'live')) {
+                startCamera(currentFacingMode);
+            }
+            if (!isListening && !isAiSpeaking) {
+                startSpeechRecognitionLoop();
+            }
+        });
     </script>
 </body>
 </html>
