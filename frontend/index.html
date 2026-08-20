@@ -1967,10 +1967,14 @@ Return answer in clean JSON:
         }
 
         async function executeAssist(customQuery = null) {
-            const query = customQuery || textInput.value.trim();
-            if (!query || isCurrentlyProcessing) return;
+            const query = customQuery || (textInput ? textInput.value.trim() : "");
+            if (!query) return;
+            if (isCurrentlyProcessing) return;
 
-            const t = query.toLowerCase();
+            // Clear input box immediately so user can ask new questions without manual clearing or reload
+            if (textInput) textInput.value = "";
+
+            const t = query.toLowerCase().trim();
 
             // 1. Instant Stop & Cancel Handlers (0ms latency)
             const STOP_COMMANDS = ['stop', 'cancel', 'halt', 'quit', 'exit', 'shut up', 'quiet', 'silence', 'pause', 'hush', 'found it', 'stop it', 'stop finding', 'stop tracking', 'stop navigation', 'enough'];
@@ -2009,25 +2013,28 @@ Return answer in clean JSON:
                 if (rawItem && rawItem.length > 1 && !rawItem.includes('navigate') && !rawItem.includes('mode') && !rawItem.includes('stop')) {
                     isCurrentlyProcessing = true;
                     micBtn.classList.add('processing');
-                    guidanceTextEl.innerText = `Recording spatial memory for ${rawItem}...`;
-                    intentBadge.innerText = "🧠 Saving Memory";
-                    const imageBase64 = captureCurrentFrameBase64();
-                    let memDesc = "in front of your camera view";
-                    if (GEMINI_API_KEY) {
-                        try {
-                            const aiAnalysis = await runGeminiVisionPipeline(`Where is the ${rawItem} located in this camera view? Describe its exact relative position, surface, and nearby landmarks in 1 concise phrase.`, imageBase64);
-                            if (aiAnalysis && aiAnalysis.spoken_response) {
-                                memDesc = aiAnalysis.spoken_response;
-                            }
-                        } catch(e) {}
+                    try {
+                        guidanceTextEl.innerText = `Recording spatial memory for ${rawItem}...`;
+                        intentBadge.innerText = "🧠 Saving Memory";
+                        const imageBase64 = captureCurrentFrameBase64();
+                        let memDesc = "in front of your camera view";
+                        if (GEMINI_API_KEY) {
+                            try {
+                                const aiAnalysis = await runGeminiVisionPipeline(`Where is the ${rawItem} located in this camera view? Describe its exact relative position, surface, and nearby landmarks in 1 concise phrase.`, imageBase64);
+                                if (aiAnalysis && aiAnalysis.spoken_response) {
+                                    memDesc = aiAnalysis.spoken_response;
+                                }
+                            } catch(e) {}
+                        }
+                        saveLocalMemory(rawItem, memDesc, [rawItem], "in front of you", "0.8");
+                        const reply = `Remembered! Saved location for ${rawItem}: ${memDesc}`;
+                        guidanceTextEl.innerText = reply;
+                        speak(reply);
+                        triggerHaptic([60, 40, 60]);
+                    } finally {
+                        isCurrentlyProcessing = false;
+                        micBtn.classList.remove('processing');
                     }
-                    saveLocalMemory(rawItem, memDesc, [rawItem], "in front of you", "0.8");
-                    const reply = `Remembered! Saved location for ${rawItem}: ${memDesc}`;
-                    guidanceTextEl.innerText = reply;
-                    speak(reply);
-                    triggerHaptic([60, 40, 60]);
-                    isCurrentlyProcessing = false;
-                    micBtn.classList.remove('processing');
                     return;
                 }
             }
@@ -2063,113 +2070,118 @@ Return answer in clean JSON:
             micBtn.classList.add('processing');
             triggerHaptic([30]);
 
-            const startTime = performance.now();
-            guidanceTextEl.innerText = "Analyzing surroundings...";
-            intentBadge.innerText = "Analyzing ✨";
+            try {
+                const startTime = performance.now();
+                guidanceTextEl.innerText = "Analyzing surroundings...";
+                intentBadge.innerText = "Analyzing ✨";
 
-            const imageBase64 = captureCurrentFrameBase64();
-            let data = null;
+                const imageBase64 = captureCurrentFrameBase64();
+                let data = null;
 
-            // Strategy: Cloud AI Vision ➔ Python Backend ➔ Fast Local Edge AI
-            if (GEMINI_API_KEY) {
-                try {
-                    data = await runGeminiVisionPipeline(query, imageBase64);
-                } catch (geminiErr) {
-                    console.log("AI Vision fallback notice:", geminiErr);
-                    data = null;
-                }
-            }
-
-            if (!data && API_URL) {
-                try {
-                    const response = await fetch(`${API_URL}/assist`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            intent_text: query,
-                            image_base64: imageBase64
-                        })
-                    });
-                    if (response.ok) data = await response.json();
-                } catch (e) {}
-            }
-
-            if (!data) {
-                // Instant fallback to in-browser Edge AI
-                data = {
-                    intent: "edge_ai",
-                    spoken_response: latestDetections.length > 0 ? "Detected " + latestDetections.map(d => d.class).join(', ') + " nearby." : "Your surroundings appear clear.",
-                    raw_data: { all_detections: latestDetections, path_clear: latestDetections.filter(d => d.is_obstacle).length === 0 }
-                };
-            }
-
-            // If Cloud AI returned specific open-vocabulary detected objects, convert to canvas bounding boxes & update passive memory
-            if (data.raw_data && Array.isArray(data.raw_data.detected_objects) && data.raw_data.detected_objects.length > 0) {
-                const w = videoEl.videoWidth || canvasEl.width || 640;
-                const h = videoEl.videoHeight || canvasEl.height || 480;
-                const geminiBoxes = data.raw_data.detected_objects.map(obj => {
-                    const [ymin, xmin, ymax, xmax] = obj.box_2d || [200, 200, 600, 600];
-                    if (obj.label && obj.label.length > 2) {
-                        saveLocalMemory(obj.label, `Seen ${obj.position || 'in front'} (~${obj.distance_m || '0.9'}m)`, [obj.label], obj.position || 'in front', obj.distance_m || '0.9', true);
+                // Strategy: Cloud AI Vision ➔ Python Backend ➔ Fast Local Edge AI
+                if (GEMINI_API_KEY) {
+                    try {
+                        data = await runGeminiVisionPipeline(query, imageBase64);
+                    } catch (geminiErr) {
+                        console.log("AI Vision fallback notice:", geminiErr);
+                        data = null;
                     }
-                    return {
-                        class: obj.label || "target",
-                        score: 95,
-                        bbox: [
-                            Math.round((xmin / 1000) * w),
-                            Math.round((ymin / 1000) * h),
-                            Math.round((xmax / 1000) * w),
-                            Math.round((ymax / 1000) * h)
-                        ],
-                        distance_m: obj.distance_m ? obj.distance_m.toString() : "0.9",
-                        position: obj.position || "in front of you",
-                        is_obstacle: false
-                    };
-                });
-                latestDetections = geminiBoxes;
-                data.raw_data.all_detections = geminiBoxes;
-            } else {
-                if (!data.raw_data) data.raw_data = {};
-                if (!data.raw_data.all_detections && latestDetections.length > 0) {
-                    data.raw_data.all_detections = latestDetections;
                 }
+
+                if (!data && API_URL) {
+                    try {
+                        const response = await fetch(`${API_URL}/assist`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                intent_text: query,
+                                image_base64: imageBase64
+                            })
+                        });
+                        if (response.ok) data = await response.json();
+                    } catch (e) {}
+                }
+
+                if (!data) {
+                    // Instant fallback to in-browser Edge AI
+                    data = {
+                        intent: "edge_ai",
+                        spoken_response: latestDetections.length > 0 ? "Detected " + latestDetections.map(d => d.class).join(', ') + " nearby." : "Your surroundings appear clear.",
+                        raw_data: { all_detections: latestDetections, path_clear: latestDetections.filter(d => d.is_obstacle).length === 0 }
+                    };
+                }
+
+                // If Cloud AI returned specific open-vocabulary detected objects, convert to canvas bounding boxes & update passive memory
+                if (data.raw_data && Array.isArray(data.raw_data.detected_objects) && data.raw_data.detected_objects.length > 0) {
+                    const w = videoEl.videoWidth || canvasEl.width || 640;
+                    const h = videoEl.videoHeight || canvasEl.height || 480;
+                    const geminiBoxes = data.raw_data.detected_objects.map(obj => {
+                        const [ymin, xmin, ymax, xmax] = obj.box_2d || [200, 200, 600, 600];
+                        if (obj.label && obj.label.length > 2) {
+                            saveLocalMemory(obj.label, `Seen ${obj.position || 'in front'} (~${obj.distance_m || '0.9'}m)`, [obj.label], obj.position || 'in front', obj.distance_m || '0.9', true);
+                        }
+                        return {
+                            class: obj.label || "target",
+                            score: 95,
+                            bbox: [
+                                Math.round((xmin / 1000) * w),
+                                Math.round((ymin / 1000) * h),
+                                Math.round((xmax / 1000) * w),
+                                Math.round((ymax / 1000) * h)
+                            ],
+                            distance_m: obj.distance_m ? obj.distance_m.toString() : "0.9",
+                            position: obj.position || "in front of you",
+                            is_obstacle: false
+                        };
+                    });
+                    latestDetections = geminiBoxes;
+                    data.raw_data.all_detections = geminiBoxes;
+                } else {
+                    if (!data.raw_data) data.raw_data = {};
+                    if (!data.raw_data.all_detections && latestDetections.length > 0) {
+                        data.raw_data.all_detections = latestDetections;
+                    }
+                }
+
+                const latency = Math.round(performance.now() - startTime);
+                document.getElementById('responseTime').innerText = `${latency} ms`;
+
+                const isHazardAlert = data.raw_data && data.raw_data.path_clear === false;
+                
+                if (isHazardAlert) {
+                    intentBadge.innerText = "⚠️ HAZARD DETECTED";
+                    intentBadge.className = "guidance-badge hazard-badge";
+                    guidanceCardBox.className = "guidance-box hazard-active";
+                    triggerHaptic([150, 70, 150]);
+                } else {
+                    intentBadge.innerText = data.ai_engine ? `✨ ${data.ai_engine}` : (data.intent ? data.intent.replace(/_/g, ' ') : 'Response');
+                    intentBadge.className = "guidance-badge gemini-badge";
+                    guidanceCardBox.className = "guidance-box gemini-mode-active";
+                }
+
+                guidanceTextEl.innerText = data.spoken_response || "Analysis complete.";
+                jsonOutput.innerText = JSON.stringify(data, null, 2);
+
+                // Draw bounding boxes on screen
+                const raw = data.raw_data || {};
+                const boxes = raw.all_detections || raw.hazards_detected || latestDetections || [];
+                drawBoundingBoxes(boxes);
+                document.getElementById('detectionCount').innerText = `${boxes.length} objects localized (Spatial HUD)`;
+
+                speak(data.spoken_response);
+
+            } catch (err) {
+                console.error("ExecuteAssist error:", err);
+                guidanceTextEl.innerText = "Ready. Please ask again.";
+            } finally {
+                setTimeout(() => {
+                    isCurrentlyProcessing = false;
+                    micBtn.classList.remove('processing');
+                }, 300);
             }
-
-            const latency = Math.round(performance.now() - startTime);
-            document.getElementById('responseTime').innerText = `${latency} ms`;
-
-            const isHazardAlert = data.raw_data && data.raw_data.path_clear === false;
-            
-            if (isHazardAlert) {
-                intentBadge.innerText = "⚠️ HAZARD DETECTED";
-                intentBadge.className = "guidance-badge hazard-badge";
-                guidanceCardBox.className = "guidance-box hazard-active";
-                triggerHaptic([150, 70, 150]);
-            } else {
-                intentBadge.innerText = data.ai_engine ? `✨ ${data.ai_engine}` : (data.intent ? data.intent.replace(/_/g, ' ') : 'Response');
-                intentBadge.className = "guidance-badge gemini-badge";
-                guidanceCardBox.className = "guidance-box gemini-mode-active";
-            }
-
-            guidanceTextEl.innerText = data.spoken_response || "Analysis complete.";
-            jsonOutput.innerText = JSON.stringify(data, null, 2);
-
-            // Draw bounding boxes on screen
-            const raw = data.raw_data || {};
-            const boxes = raw.all_detections || raw.hazards_detected || latestDetections || [];
-            drawBoundingBoxes(boxes);
-            document.getElementById('detectionCount').innerText = `${boxes.length} objects localized (Spatial HUD)`;
-
-            speak(data.spoken_response);
-
-            setTimeout(() => {
-                isCurrentlyProcessing = false;
-                micBtn.classList.remove('processing');
-            }, 500);
         }
 
         function runPreset(text) {
-            textInput.value = text;
             executeAssist(text);
         }
 
